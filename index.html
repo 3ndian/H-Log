@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; manifest-src 'self'; worker-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#0f1318">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Health Log">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Health Log</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+:root{--bg:#0f1318;--card:#171d25;--ink:#e6edf3;--mut:#9aa7b4;--acc:#3dd6c6;--line:#27303b;--good:#4ade80;--ok:#60a5fa;--warn:#fbbf24;--bad:#f87171;--r:16px;--safeb:env(safe-area-inset-bottom,0px);--safet:env(safe-area-inset-top,0px)}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;min-height:100dvh;-webkit-text-size-adjust:100%}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.mono,.big{font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+td{font-variant-numeric:tabular-nums}
+.mut{color:var(--mut)}
+p{line-height:1.5;margin:0 0 8px}
+h1,h2,h3{margin:0}
+a{color:var(--acc)}
+.app{max-width:1120px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding-top:var(--safet)}
+.banner{background:#2b2410;color:#f3d98a;border-bottom:1px solid #5a4a1a;padding:8px 14px;font-size:13px;text-align:center}
+.nav{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin:14px auto 0;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px;max-width:calc(100% - 20px)}
+.nb{background:none;border:0;color:var(--mut);border-radius:999px;padding:8px 13px;font-size:14px;min-height:40px;display:flex;gap:6px;align-items:center}
+.nb[aria-current="page"]{background:var(--acc);color:#06201d;font-weight:600}
+.nb svg{display:none}
+.bnav{display:none}
+main{padding:20px 20px calc(30px + var(--safeb));flex:1;min-width:0}
+.vt{font-size:22px;letter-spacing:-.01em;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;grid-auto-flow:dense}
+.grid>.span2{grid-column:span 2}.grid>.span4{grid-column:1/-1}.grid>.rs2{grid-row:span 2}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;align-items:start}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:start}
+.stack{display:grid;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0;container-type:inline-size}
+.card h3{margin:0 0 10px;font-size:12.5px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:5px;min-width:0;text-align:left;color:inherit;width:100%}
+button.tile:hover{border-color:#3a4656}
+.tl{font-size:12.5px;color:var(--mut)}
+.big{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.05}
+.tile small{color:var(--mut);font-size:12px}
+.chip{--c:var(--ok);display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);white-space:nowrap}
+.chip.good{--c:var(--good)}.chip.ok{--c:var(--ok)}.chip.warn{--c:var(--warn)}.chip.bad{--c:var(--bad)}.chip.mut{--c:var(--mut)}
+.chip::before{content:"•"}.chip.good::before{content:"✓"}.chip.warn::before{content:"!"}.chip.bad::before{content:"▲"}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.btn{background:var(--acc);color:#06201d;border:0;border-radius:10px;padding:10px 14px;font-weight:600;min-height:44px}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:#f87171;color:#2a0705}
+.btn.sm{min-height:36px;padding:6px 10px;font-size:13px}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.bl{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;flex-wrap:wrap}
+.bar{height:9px;border-radius:9px;background:var(--line);overflow:hidden;margin:5px 0 10px}
+.bar i{display:block;height:100%;width:0;background:var(--acc);border-radius:9px;animation:grow .8s .1s cubic-bezier(.3,.9,.3,1) forwards}
+@keyframes grow{to{width:var(--w)}}
+.goalt{font-size:22px;line-height:1.2;font-weight:700;letter-spacing:-.02em;margin:2px 0 12px}
+.note{font-size:12.5px;color:var(--mut);margin-top:8px}
+.empty{color:var(--mut);font-size:14px;padding:14px;border:1px dashed var(--line);border-radius:12px;text-align:center}
+ul.plain{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+ul.plain li{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;font-size:14px}
+label.sw{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:7px 0;line-height:1.35}
+input[type=checkbox],input[type=radio]{width:20px;height:20px;accent-color:var(--acc);flex:none;margin:0}
+textarea,.inp,select{width:100%;background:#0f1318;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:16px;min-height:44px}
+textarea{min-height:110px;font-family:ui-monospace,Menlo,monospace;font-size:14px}
+.fld{display:grid;gap:5px;margin-bottom:12px;font-size:13px;color:var(--mut)}
+.fld2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-weight:600;color:var(--mut);text-align:left;font-size:12px;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl{overflow-x:auto}
+svg text{fill:var(--mut);font-size:10px;font-family:inherit}
+.gl{stroke:var(--line);stroke-width:1}
+.ln{fill:none;stroke:var(--acc);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.refl{stroke:var(--good);stroke-width:1.5;stroke-dasharray:5 4}
+.ev{stroke:var(--mut);stroke-width:1;stroke-dasharray:2 3;opacity:.7}
+.evc{fill:var(--ink)}.evt{fill:#0f1318!important;font-weight:700}
+.dotp{fill:var(--card);stroke:var(--acc);stroke-width:2.5}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1s .1s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.fast{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.fast b{font-size:22px;display:block}
+.ring{width:112px;height:112px;flex:none}
+.ring circle{fill:none;stroke-width:11}
+.ring .bg{stroke:var(--line)}
+.ring .fg{stroke:var(--acc);stroke-linecap:round;stroke-dasharray:0 100;animation:ring 1.1s .1s cubic-bezier(.3,.9,.3,1) forwards;transform:rotate(-90deg);transform-origin:50% 50%}
+@keyframes ring{to{stroke-dasharray:var(--p) 100}}
+@container (max-width:300px){.fast{flex-direction:column;align-items:flex-start;gap:10px}}
+.qlog{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.qlog .btn{padding:10px 6px;font-size:13px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--card);flex-wrap:wrap}
+.seg button{background:none;border:0;color:var(--mut);border-radius:999px;padding:7px 14px;min-height:38px;font-size:13.5px}
+.seg button[aria-pressed="true"]{background:var(--acc);color:#06201d;font-weight:600}
+.seg.sm button{padding:5px 10px;min-height:34px;font-size:12.5px}
+.hbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap}
+.crow{align-items:center!important;flex-wrap:wrap}
+.crow .cn{flex:1 1 150px;font-weight:600}
+.ib{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;width:38px;height:38px}
+.ib:disabled{opacity:.35}
+.modes{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.mode{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:8px 14px;min-height:40px;font-size:13.5px}
+.mode[aria-pressed="true"]{background:var(--acc);color:#06201d;border-color:var(--acc);font-weight:600}
+pre.out{white-space:pre-wrap;word-break:break-word;background:#0f1318;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:12.5px;line-height:1.5;max-height:360px;overflow:auto;margin:0;font-family:ui-monospace,Menlo,monospace}
+.pt{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:10px;font-size:13.5px}
+.pt details{margin-top:8px;font-size:13px}
+.pt summary{cursor:pointer;color:var(--acc)}
+.scale{display:inline-flex;gap:5px}
+.scale label{position:relative}
+.scale input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.scale span{display:grid;place-items:center;width:36px;height:36px;border-radius:8px;border:1px solid var(--line);font-size:13px}
+.scale input:checked+span{background:var(--acc);color:#06201d;font-weight:700;border-color:var(--acc)}
+.scale input:focus-visible+span{outline:2px solid var(--ink)}
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stat3>div{background:#0f1318;border:1px solid var(--line);border-radius:10px;padding:9px;font-size:12.5px;color:var(--mut)}
+.stat3 b{display:block;color:var(--ink);font-size:15px;font-family:ui-monospace,Menlo,monospace}
+.screen{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:20px;padding-top:calc(20px + var(--safet))}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;max-width:460px;width:100%}
+.panel h1{font-size:24px;margin-bottom:8px}
+.choice{border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.choice.rec{border-color:var(--acc)}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin:4px 0}
+.okmsg{color:var(--good);font-size:13px}
+.wipe{border:1px solid color-mix(in srgb,var(--bad) 50%,var(--line));border-radius:12px;padding:14px}
+.hold{position:relative;overflow:hidden;min-width:200px}
+.hold i{position:absolute;inset:0 auto 0 0;width:0;background:rgba(0,0,0,.35)}
+.hold span{position:relative}
+code{background:#26303b;padding:1px 6px;border-radius:5px}
+dialog{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:0;width:min(560px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflow:auto}
+dialog::backdrop{background:rgba(5,8,11,.72)}
+.dlgf{padding:20px}
+.dlgf h3{font-size:18px;margin-bottom:12px}
+.dlgr{justify-content:flex-end;margin-top:16px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + var(--safeb));background:#e6edf3;color:#0f1318;border-radius:12px;padding:10px 14px;display:flex;gap:12px;align-items:center;z-index:60;max-width:calc(100% - 24px);box-shadow:0 6px 24px rgba(0,0,0,.4);font-size:14px}
+.toast button{background:none;border:0;color:#0a6a60;font-weight:700;min-height:36px}
+.lock{position:fixed;inset:0;background:var(--bg);z-index:80;display:grid;place-items:center;padding:20px}
+.pop{animation:pop .4s cubic-bezier(.2,.9,.3,1.1) both;animation-delay:calc(var(--i,0)*40ms)}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+@media (max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:700px){
+ .nav{display:none}
+ .bnav{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:6px 4px calc(6px + var(--safeb));justify-content:space-around;z-index:30}
+ .bnav button{background:none;border:0;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;min-width:58px;min-height:48px;padding:4px 6px}
+ .bnav button[aria-current="page"]{color:var(--acc);font-weight:600}
+ main{padding:16px 14px calc(90px + var(--safeb))}
+ .grid,.g2,.g3{grid-template-columns:1fr}.grid>.span2{grid-column:auto}.grid>.rs2{grid-row:auto}
+ .fld2{grid-template-columns:1fr}
+ .stat3{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}}
+
+.anim .card,.anim .tile,.anim .vt{animation:pop .4s cubic-bezier(.2,.9,.3,1.1) both;animation-delay:calc(var(--i,0)*40ms)}
+
+@media(min-width:700px){.toast{bottom:24px}}
+.dlgr{position:sticky;bottom:-20px;background:var(--card);padding:12px 0 4px;margin-top:12px;border-top:1px solid var(--line)}
+label.chip.mut{position:relative}
+label.chip.mut::before{content:"";width:0;margin:0}
+label.chip.mut input{position:absolute;opacity:0;width:100%;height:100%;left:0;top:0;margin:0;cursor:pointer}
+label.chip.mut:has(input:checked){--c:var(--good);box-shadow:inset 0 0 0 1px var(--c)}
+label.chip.mut:has(input:checked)::before{content:"✓";width:auto;margin-right:2px}
+label.chip.mut:has(input:focus-visible){outline:2px solid var(--accent,#3dd6c6);outline-offset:2px}
+
+</style>
+</head>
+<body>
+<div id="root"></div>
+<noscript><p style="padding:20px">Health Log needs JavaScript to run. It makes no network requests.</p></noscript>
+<script>
+'use strict';
+/* =====================================================================
+   Health Log — core logic (no DOM). Safe to run in Node for tests.
+   Nothing here makes network requests.
+   ===================================================================== */
+
+/* ---------- basics ---------- */
+const enc=new TextEncoder(),dec=new TextDecoder();
+const b64=buf=>{const u=buf instanceof Uint8Array?buf:new Uint8Array(buf);let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
+const unb64=s=>{const bin=atob(s);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u};
+const rnd=n=>crypto.getRandomValues(new Uint8Array(n));
+const uid=()=>b64(rnd(9)).replace(/\+/g,'-').replace(/\//g,'_');
+const pad2=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
+const todayStr=()=>ymd(new Date());
+const nowISO=()=>new Date().toISOString();
+const dayNum=s=>Math.round(Date.parse(s+'T12:00:00Z')/86400000);
+const addDays=(s,n)=>{const d=new Date(s+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
+const weekStart=(s)=>{s=s||todayStr();const d=new Date(s+'T12:00:00Z');const dow=(d.getUTCDay()+6)%7;d.setUTCDate(d.getUTCDate()-dow);return d.toISOString().slice(0,10)};
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fmtDate=(s,y=true)=>{const [Y,M,D]=s.split('-').map(Number);return MON[M-1]+' '+D+(y?', '+Y:'')};
+const daysAgoText=s=>{const n=dayNum(todayStr())-dayNum(s);return n<=0?'today':n===1?'yesterday':n<60?n+' days ago':Math.round(n/30.4)+' months ago'};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=(v,dec)=>{if(v==null||isNaN(v))return '–';dec=dec==null?(Math.abs(v)<10&&v%1?1:0):dec;return Number(v).toFixed(dec)};
+
+/* ---------- crypto: random master key, wrapped by "slots" ---------- */
+const KDF_ITER=600000;
+async function kekFromPass(pass,salt,iter){
+  const base=await crypto.subtle.importKey('raw',enc.encode(String(pass).normalize('NFKC')),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',hash:'SHA-256',salt,iterations:iter},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+const aesKey=raw=>crypto.subtle.importKey('raw',raw,'AES-GCM',false,['encrypt','decrypt']);
+async function seal(key,bytes){const iv=rnd(12);const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,bytes);return {iv:b64(iv),ct:b64(ct)}}
+async function open(key,box){return new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(box.iv)},key,unb64(box.ct)))}
+const kdfInfo=(salt,iter)=>({alg:'PBKDF2-SHA256',iter:iter||KDF_ITER,salt:b64(salt)});
+
+async function createVault(pass,data){
+  const master=rnd(32),salt=rnd(16);
+  const kek=await kekFromPass(pass,salt,KDF_ITER);
+  const mk=await aesKey(master);
+  const env={v:1,kdf:kdfInfo(salt),slots:{pass:await seal(kek,master)},data:await seal(mk,enc.encode(JSON.stringify(data))),updated:nowISO()};
+  return {env,master,mk};
+}
+async function openWithMaster(env,master){
+  const mk=await aesKey(master);
+  const data=JSON.parse(dec.decode(await open(mk,env.data)));
+  return {master,mk,data};
+}
+async function unlockWithPass(env,pass){
+  const kek=await kekFromPass(pass,unb64(env.kdf.salt),env.kdf.iter);
+  let master;try{master=await open(kek,env.slots.pass)}catch(e){throw new Error('Wrong passphrase')}
+  return openWithMaster(env,master);
+}
+async function sealData(env,mk,data){env.data=await seal(mk,enc.encode(JSON.stringify(data)));env.updated=nowISO();return env}
+async function changePassphrase(env,master,newPass){const salt=rnd(16);const kek=await kekFromPass(newPass,salt,KDF_ITER);env.kdf=kdfInfo(salt);env.slots.pass=await seal(kek,master)}
+
+/* passkey slot: wrap the master key with a key derived from the passkey's PRF output */
+const PRF_SALT=enc.encode('healthlog-prf-v1-unlock');
+async function prfWrapKey(out){
+  const base=await crypto.subtle.importKey('raw',out,'HKDF',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'HKDF',hash:'SHA-256',salt:new Uint8Array(32),info:enc.encode('healthlog wrap')},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function addPasskeySlot(env,master,credId,prfOut){env.slots.passkey={credId:b64(credId),...await seal(await prfWrapKey(prfOut),master)}}
+async function unlockWithPrf(env,prfOut){
+  let master;try{master=await open(await prfWrapKey(prfOut),env.slots.passkey)}catch(e){throw new Error('Passkey could not unlock this vault')}
+  return openWithMaster(env,master);
+}
+
+/* encrypted backup: self-contained, opens on any device with its passphrase */
+async function makeBackup(data,pass){
+  const salt=rnd(16),kek=await kekFromPass(pass,salt,KDF_ITER);
+  return {format:'healthlog-backup',v:1,kdf:kdfInfo(salt),...await seal(kek,enc.encode(JSON.stringify(data))),created:nowISO()};
+}
+async function readBackup(obj,pass){
+  if(!obj||obj.format!=='healthlog-backup')throw new Error('This is not a Health Log backup');
+  const kek=await kekFromPass(pass,unb64(obj.kdf.salt),obj.kdf.iter);
+  try{return JSON.parse(dec.decode(await open(kek,obj)))}catch(e){throw new Error('Wrong passphrase, or the file is damaged')}
+}
+const backupToText=obj=>'HL1:'+b64(enc.encode(JSON.stringify(obj)));
+function backupFromText(t){
+  const raw=String(t).trim();
+  try{const o=JSON.parse(raw);if(o&&typeof o==='object')return o}catch(e){}
+  let x=raw.replace(/\s+/g,'');if(x.startsWith('HL1:'))x=x.slice(4);
+  try{return JSON.parse(dec.decode(unb64(x)))}catch(e){}
+  throw new Error('That text is not a Health Log backup');
+}
+
+/* ---------- reference tests (general ranges, not medical advice) ---------- */
+const TESTS={
+  ldl:{name:'LDL cholesterol',unit:'mg/dL',dec:0,general:'Optimal under 100',ref:100,refLabel:'optimal under',fn:v=>v<100?['Optimal','good']:v<130?['Near optimal','ok']:v<160?['Borderline high','warn']:['High','bad'],match:/\bLDL\b/i,skip:/ratio|non[- ]?hdl|vldl/i},
+  hdl:{name:'HDL cholesterol',unit:'mg/dL',dec:0,general:'40+ acceptable, 60+ protective',fn:v=>v<40?['Low','bad']:v<60?['Acceptable','ok']:['Protective','good'],match:/\bHDL\b/i,skip:/ratio|non[- ]?hdl|\bLDL\b/i},
+  trig:{name:'Triglycerides',unit:'mg/dL',dec:0,general:'Under 150',ref:150,refLabel:'normal under',fn:v=>v<150?['Normal','good']:v<200?['Borderline high','warn']:v<500?['High','bad']:['Very high','bad'],match:/triglycerid/i},
+  tc:{name:'Total cholesterol',unit:'mg/dL',dec:0,general:'Under 200',ref:200,refLabel:'desirable under',fn:v=>v<200?['Desirable','good']:v<240?['Borderline high','warn']:['High','bad'],match:/total\s+cholesterol|cholesterol,?\s*total/i,skip:/ratio/i},
+  a1c:{name:'Hemoglobin A1C',unit:'%',dec:1,general:'Under 5.7',ref:5.7,refLabel:'normal under',fn:v=>v<5.7?['Normal','good']:v<6.5?['Elevated','warn']:['High','bad'],match:/a1c/i},
+  glu:{name:'Fasting glucose',unit:'mg/dL',dec:0,general:'70–99',ref:100,refLabel:'normal under',fn:v=>v<70?['Low','warn']:v<100?['Normal','good']:v<126?['Elevated','warn']:['High','bad'],match:/glucose/i,skip:/urine|random|tolerance|post/i},
+  vitd:{name:'Vitamin D (25-OH)',unit:'ng/mL',dec:0,general:'30–100 typical',fn:v=>v<20?['Low','warn']:v<30?['Below typical','warn']:v<=100?['Typical','good']:['High','warn'],match:/vitamin\s*d|25[- ]?(?:oh|hydroxy)/i},
+  tsh:{name:'TSH',unit:'mIU/L',dec:2,general:'0.4–4.0 typical',fn:v=>v<0.4?['Below typical','warn']:v<=4?['Typical','good']:['Above typical','warn'],match:/\bTSH\b|thyroid stimulating/i}
+};
+const CONV={ldl:38.67,hdl:38.67,tc:38.67,trig:88.57,glu:18.016};
+const testKeys=()=>Object.keys(TESTS);
+
+const MONTHS_RE='(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\\.?';
+function parseDateText(text){
+  const lines=String(text).split(/\r?\n/);
+  const one=s=>{
+    let m;
+    if(m=/\b(\d{4})-(\d{2})-(\d{2})\b/.exec(s))return m[1]+'-'+m[2]+'-'+m[3];
+    if(m=/\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/.exec(s)){let y=+m[3];if(y<100)y+=2000;return y+'-'+pad2(+m[1])+'-'+pad2(+m[2])}
+    if(m=new RegExp(MONTHS_RE+'\\s+(\\d{1,2}),?\\s+(\\d{4})','i').exec(s)){const mi=MON.findIndex(x=>x.toLowerCase()===m[1].toLowerCase().slice(0,3));return m[3]+'-'+pad2(mi+1)+'-'+pad2(+m[2])}
+    return null;
+  };
+  const ok=d=>d&&!isNaN(Date.parse(d))&&d<=addDays(todayStr(),1)&&d>='1990-01-01';
+  for(const l of lines){if(/collect|drawn|specimen|date/i.test(l)){const d=one(l);if(ok(d))return d}}
+  for(const l of lines){const d=one(l);if(ok(d))return d}
+  return null;
+}
+function normRange(t){return String(t).replace(/[–—]/g,'-').replace(/\s+/g,'').replace(/[()]/g,'')}
+function parseRange(t){
+  if(!t)return null;t=normRange(t);let m;
+  if(m=/^(<=|≤|<)(\d+(?:\.\d+)?)$/.exec(t))return {hi:+m[2],hiX:m[1]==='<'};
+  if(m=/^(>=|≥|>)(\d+(?:\.\d+)?)$/.exec(t))return {lo:+m[2],loX:m[1]==='>'};
+  if(m=/^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/.exec(t))return {lo:+m[1],hi:+m[2]};
+  return null;
+}
+function inRange(v,r){
+  if(!r)return null;
+  if(r.lo!=null&&(r.loX?v<=r.lo:v<r.lo))return false;
+  if(r.hi!=null&&(r.hiX?v>=r.hi:v>r.hi))return false;
+  return true;
+}
+const RANGE_RE=/\(?\s*((?:<=|>=|≤|≥|<|>)\s*\d+(?:\.\d+)?|\d+(?:\.\d+)?\s*[-–—]\s*\d+(?:\.\d+)?)\s*\)?/;
+const UNIT_RE=/^\s*(mg\/dL|mmol\/L|nmol\/L|ng\/mL|mIU\/L|uIU\/mL|µIU\/mL|%)/i;
+
+function parseLabText(text){
+  const lines=String(text).split(/\r?\n/);const rows=[];
+  for(const k of testKeys()){
+    const T=TESTS[k];
+    for(const raw of lines){
+      let line=raw;if(k==='vitd')line=line.replace(/25[- ]?(?:oh|hydroxy)/ig,' ');
+      const m=T.match.exec(line);if(!m||(T.skip&&T.skip.test(line)))continue;
+      const rest=line.slice(m.index+m[0].length);
+      const nm=/([<>≤≥]=?)?\s*(\d+(?:\.\d+)?)/.exec(rest);if(!nm||nm[1])continue;
+      let value=parseFloat(nm[2]);const after=rest.slice(nm.index+nm[0].length);
+      const um=UNIT_RE.exec(after);let unit=um?um[1]:T.unit;let note='';
+      const ul=unit.toLowerCase();
+      if(ul==='mmol/l'&&CONV[k]){value=Math.round(value*CONV[k]*10)/10;note='converted from mmol/L';unit=T.unit}
+      else if(ul==='nmol/l'&&k==='vitd'){value=Math.round(value/2.496*10)/10;note='converted from nmol/L';unit=T.unit}
+      else if(um&&ul!==T.unit.toLowerCase()){note='unit on the report: '+unit}
+      else unit=T.unit;
+      const tail=um?after.slice(um[0].length):after;
+      const rm=RANGE_RE.exec(tail);
+      rows.push({test:k,value,unit:T.unit,range:rm?normRange(rm[1]):'',note});
+      break;
+    }
+  }
+  return {date:parseDateText(text),rows};
+}
+
+/* ---------- body metrics ---------- */
+function defaultMetricDefs(){
+  const t=nowISO();
+  return [
+    {id:'weight',name:'Weight',unit:'lb',better:'none',dec:1,builtin:true,updatedAt:t},
+    {id:'waist',name:'Waist',unit:'in',better:'none',dec:1,builtin:true,updatedAt:t},
+    {id:'bp',name:'Blood pressure',unit:'mmHg',better:'band',pair:true,dec:0,builtin:true,updatedAt:t},
+    {id:'sleep',name:'Sleep',unit:'hours',better:'band',lo:7,hi:9,dec:1,builtin:true,updatedAt:t},
+    {id:'rhr',name:'Resting heart rate',unit:'bpm',better:'band',lo:50,hi:100,dec:0,builtin:true,updatedAt:t}
+  ];
+}
+function bpStatus(s,d){
+  if(s>=140||d>=90)return ['Stage 2 range','bad'];
+  if(s>=130||d>=80)return ['Stage 1 range','warn'];
+  if(s>=120)return ['Elevated','warn'];
+  return ['Normal','good'];
+}
+function metricStatus(def,r){
+  if(!r)return null;
+  if(def.id==='bp'&&r.value2!=null)return bpStatus(r.value,r.value2);
+  if(def.better==='band'&&(def.lo!=null||def.hi!=null)){
+    if(def.lo!=null&&r.value<def.lo)return ['Below range','warn'];
+    if(def.hi!=null&&r.value>def.hi)return ['Above range','warn'];
+    return ['Inside range','good'];
+  }
+  return null;
+}
+
+/* ---------- data model ---------- */
+const COLL=['labs','metricDefs','readings','goals','habitLogs','events','notes','questions','imports','fasts','checkins','foods','days'];
+function emptyData(){
+  return {v:1,
+    profile:{heightIn:null,ageRange:'',sex:'',updatedAt:nowISO()},
+    settings:{home:{where:{goals:'pin',today:'pin',upcoming:'pin',quick:'pin',habits:'more',weight:'more',checkin:'more',notes:'more',doctorq:'more',labs:'more'},order:['goals','today','upcoming','quick','habits','weight','checkin','notes','doctorq','labs']},lockMin:5,fastGoal:16,retestDays:90,doctorVisit:'',peek:false,lastBackup:null,updatedAt:nowISO()},
+    labs:[],metricDefs:defaultMetricDefs(),readings:[],goals:[],habitLogs:[],events:[],notes:[],questions:[],imports:[],fasts:[],checkins:[],foods:[],days:[]};
+}
+function ensureColl(d){for(const c of COLL)if(!Array.isArray(d[c]))d[c]=[];return d}
+
+const act=a=>(a||[]).filter(r=>!r.deleted);
+const stamp=r=>{r.updatedAt=nowISO();return r};
+function addRec(data,coll,obj){const r=stamp({id:uid(),...obj});data[coll].push(r);return r}
+function updRec(data,coll,id,patch){const r=data[coll].find(x=>x.id===id);if(!r)return null;Object.assign(r,patch);return stamp(r)}
+function delRec(data,coll,id){const r=data[coll].find(x=>x.id===id);if(!r)return;r.deleted=true;r.deletedAt=nowISO();stamp(r)}
+function restoreRec(data,coll,id){const r=data[coll].find(x=>x.id===id);if(!r||r.purged)return;delete r.deleted;delete r.deletedAt;stamp(r)}
+function purgeRec(data,coll,id){const i=data[coll].findIndex(x=>x.id===id);if(i<0)return;data[coll][i]={id,deleted:true,purged:true,deletedAt:nowISO(),updatedAt:nowISO()}}
+function autoPurge(data,days=30){
+  const cut=Date.now()-days*86400000;let n=0;
+  for(const c of COLL)for(const r of data[c]||[])if(r.deleted&&!r.purged&&r.deletedAt&&Date.parse(r.deletedAt)<cut){purgeRec(data,c,r.id);n++}
+  return n;
+}
+function mergeData(local,incoming){
+  const out=JSON.parse(JSON.stringify(local));const st={added:0,updated:0,same:0,removed:0};
+  for(const c of COLL){
+    const m=new Map((out[c]||[]).map(r=>[r.id,r]));
+    for(const r0 of (incoming[c]||[])){
+      const r=JSON.parse(JSON.stringify(r0));const cur=m.get(r.id);
+      if(!cur){m.set(r.id,r);r.deleted?st.removed++:st.added++}
+      else if((r.updatedAt||'')>(cur.updatedAt||'')){
+        if(c==='notes'&&!r.purged&&cur.text&&r.text!==cur.text)r.text=cur.text; // originals stay locked
+        m.set(r.id,r);r.deleted&&!cur.deleted?st.removed++:st.updated++;
+      } else st.same++;
+    }
+    out[c]=[...m.values()];
+  }
+  for(const k of ['profile','settings']){
+    if(incoming[k]&&(incoming[k].updatedAt||'')>(out[k].updatedAt||'')){const keep=k==='settings'?{lastBackup:out.settings.lastBackup}:{};out[k]={...out[k],...incoming[k],...keep}}
+  }
+  return {data:out,stats:st};
+}
+
+/* ---------- series & goals ---------- */
+const byDate=(a,b)=>a.t<b.t?-1:a.t>b.t?1:(a.u||'')<(b.u||'')?-1:1;
+function seriesFor(data,key){
+  if(TESTS[key])return act(data.labs).filter(l=>l.test===key).map(l=>({t:l.date,v:l.value,u:l.updatedAt,id:l.id,range:l.range,edited:l.edited})).sort(byDate);
+  return act(data.readings).filter(r=>r.metric===key).map(r=>({t:r.date,v:r.value,v2:r.value2,u:r.updatedAt,id:r.id})).sort(byDate);
+}
+function measureName(data,key){if(TESTS[key])return TESTS[key].name;const d=act(data.metricDefs).find(x=>x.id===key);return d?d.name:'(removed measure)'}
+function measureUnit(data,key){if(TESTS[key])return TESTS[key].unit;const d=act(data.metricDefs).find(x=>x.id===key);return d?d.unit:''}
+function measureDec(data,key){if(TESTS[key])return TESTS[key].dec;const d=act(data.metricDefs).find(x=>x.id===key);return d&&d.dec!=null?d.dec:1}
+function measuresWithData(data){
+  const out=[];
+  for(const k of testKeys())if(seriesFor(data,k).length)out.push(k);
+  for(const d of act(data.metricDefs))if(seriesFor(data,d.id).length)out.push(d.id);
+  return out;
+}
+function allMeasures(data){return [...testKeys(),...act(data.metricDefs).map(d=>d.id)]}
+
+function moveWords(delta,towardSign,tol){
+  if(Math.abs(delta)<=tol)return ['Holding','ok'];
+  return (delta*towardSign>0)?['Moving toward','good']:['Moving away','warn'];
+}
+function goalProgress(g,data){
+  if(g.type==='habit'){
+    const n=g.habitN||1,wk=weekStart();
+    const c=act(data.habitLogs).filter(h=>h.goal===g.id&&h.date>=wk).length;
+    return {kind:'habit',count:c,of:n,pct:Math.min(1,c/n),words:c>=n?'Done this week':'In progress',tone:c>=n?'good':'ok',detail:c+' of '+n+' this week',target:n+' per week',asOf:null};
+  }
+  const dec=measureDec(data,g.key),unit=measureUnit(data,g.key);
+  let s=seriesFor(data,g.key);
+  if(!s.length)return {kind:'none',words:'No data yet',tone:'ok',pct:null,detail:'Add a '+measureName(data,g.key)+' result to start',target:targetText(g,unit,dec),asOf:null};
+  const latest=s[s.length-1],prev=s.length>1?s[s.length-2]:null;
+  let base=null;
+  if(g.baseline==='latest'&&g.startValue!=null)base=g.startValue;
+  else if(g.startValue!=null&&g.baseline!=='first')base=g.startValue;
+  else base=s[0].v;
+  const tgt=targetText(g,unit,dec),asOf=latest.t;
+  if(g.type==='range'){
+    const r={lo:g.lo,hi:g.hi};const ok=inRange(latest.v,r);
+    const dist=v=>(g.lo!=null&&v<g.lo)?g.lo-v:(g.hi!=null&&v>g.hi)?v-g.hi:0;
+    if(ok)return {kind:'range',words:'Inside range',tone:'good',pct:1,detail:num(latest.v,dec)+' '+unit,target:tgt,asOf};
+    const d=prev?dist(latest.v)-dist(prev.v):0;
+    const [w,t]=prev?moveWords(-d,1,0.0001):['Outside range','warn'];
+    return {kind:'range',words:(latest.v<(g.lo==null?-Infinity:g.lo)?'Below range':'Above range')+(prev&&w!=='Holding'?' · '+w.toLowerCase():''),tone:t==='good'?'ok':'warn',pct:null,detail:num(latest.v,dec)+' '+unit,target:tgt,asOf};
+  }
+  // target and direction
+  const hasT=g.target!=null&&g.target!==''&&!isNaN(g.target);
+  const dir=hasT?(g.target<base?'down':g.target>base?'up':'hold'):(g.dir||'down');
+  const sign=dir==='down'?-1:1;
+  const detail=(base===latest.v?'Latest '+num(latest.v,dec):num(base,dec)+' → '+num(latest.v,dec))+' '+unit;
+  if(hasT){
+    const T=+g.target,reached=dir==='down'?latest.v<=T:dir==='up'?latest.v>=T:Math.abs(latest.v-T)<=Math.abs(T)*0.01;
+    const span=Math.abs(base-T),tol=Math.max(span*0.01,1e-9);
+    const pct=span?Math.max(0,Math.min(1,(base-latest.v)/(base-T))):(reached?1:0);
+    if(reached)return {kind:'target',words:'At target',tone:'good',pct:1,detail,target:tgt,asOf};
+    if(!prev)return {kind:'target',words:'First result recorded',tone:'ok',pct,detail,target:tgt,asOf};
+    const [w,t]=moveWords(latest.v-prev.v,sign,tol);
+    return {kind:'target',words:w,tone:t,pct,detail,target:tgt,asOf};
+  }
+  const change=latest.v-base;
+  const [w,t]=prev?moveWords(latest.v-prev.v,sign,Math.abs(base)*0.002):['First result recorded','ok'];
+  return {kind:'direction',words:w,tone:t,pct:null,detail:detail+' ('+(change>0?'up ':'down ')+num(Math.abs(change),dec)+')',target:(dir==='down'?'going down':'going up'),asOf};
+}
+function targetText(g,unit,dec){
+  if(g.type==='habit')return (g.habitN||1)+' per week';
+  if(g.type==='range'){
+    if(g.lo!=null&&g.hi!=null)return num(g.lo,dec)+'–'+num(g.hi,dec)+' '+unit;
+    if(g.hi!=null)return 'under '+num(g.hi,dec)+' '+unit;
+    if(g.lo!=null)return 'above '+num(g.lo,dec)+' '+unit;
+    return '';
+  }
+  if(g.target!=null&&g.target!==''&&!isNaN(g.target))return 'target '+num(+g.target,dec)+' '+unit;
+  return g.dir==='up'?'going up':'going down';
+}
+const GOAL_TYPES={target:'Reach a target',range:'Stay in a range',direction:'Move a direction',habit:'Do a habit'};
+
+/* ---------- before/after around an event ---------- */
+function beforeAfter(data,key,date){
+  const s=seriesFor(data,key);if(!s.length)return null;
+  const isLab=!!TESTS[key];
+  if(isLab){
+    const before=[...s].reverse().find(p=>p.t<=date),after=s.find(p=>p.t>date);
+    if(!before||!after)return {kind:'lab',before:before||null,after:after||null,note:'Needs a result on each side of this date.'};
+    return {kind:'lab',before,after,note:'Nearest result before and after. Labs are sparse, so other things may have changed in between.'};
+  }
+  const a=addDays(date,-30),b=addDays(date,30);
+  const bef=s.filter(p=>p.t>=a&&p.t<date),aft=s.filter(p=>p.t>=date&&p.t<=b);
+  const avg=x=>x.reduce((t,p)=>t+p.v,0)/x.length;
+  if(!bef.length||!aft.length)return {kind:'avg',note:'Needs readings in the 30 days before and after.'};
+  return {kind:'avg',before:{v:avg(bef),n:bef.length},after:{v:avg(aft),n:aft.length},note:'Average of readings in the 30 days before and after.'};
+}
+
+/* ---------- AI export text ---------- */
+function exportAI(data,o){
+  const L=[];const P=data.profile;
+  L.push('# HEALTH SUMMARY FOR AI — exported '+todayStr());
+  L.push('Numbers come from my own records. Reference ranges are general guides, not medical advice.');
+  if(o.profile){
+    const bits=[];if(P.ageRange)bits.push('age range '+P.ageRange);if(P.sex)bits.push('sex '+P.sex);if(P.heightIn)bits.push('height '+Math.floor(P.heightIn/12)+'′'+Math.round(P.heightIn%12)+'″');
+    if(bits.length){L.push('');L.push('## Profile');L.push('- '+bits.join(' · '))}
+  }
+  if(o.goals){
+    const gs=act(data.goals);
+    if(gs.length){L.push('');L.push('## Goals');
+      gs.sort((a,b)=>(b.primary?1:0)-(a.primary?1:0)).forEach(g=>{const p=goalProgress(g,data);L.push('- '+(g.primary?'[PRIMARY] ':'')+g.title+' — '+p.detail+(p.target?' ('+p.target+')':'')+' · '+p.words+(p.asOf?' as of '+p.asOf:'')+(g.setBy==='doctor'?' · set by my doctor':'')+(g.nextStep?' · next: '+g.nextStep:''))});
+      L.push('When goals conflict, the PRIMARY goal wins.');}
+  }
+  if(o.labs){
+    const ks=testKeys().filter(k=>seriesFor(data,k).length);
+    if(ks.length){L.push('');L.push('## Labs (latest, with trend)');
+      ks.forEach(k=>{const s=seriesFor(data,k),l=s[s.length-1],T=TESTS[k];const lab=l.range?' · lab range '+l.range+(inRange(l.v,parseRange(l.range))===false?' (outside)':inRange(l.v,parseRange(l.range))?' (inside)':''):'';
+        L.push('- '+T.name+': '+num(l.v,T.dec)+' '+T.unit+' on '+l.t+' → '+T.fn(l.v)[0]+' (general: '+T.general+')'+lab+(s.length>1?' · trend '+s.slice(-5).map(p=>num(p.v,T.dec)).join(' → ')+' ('+s.slice(-5)[0].t+' to '+l.t+')':''))});}
+  }
+  if(o.body){
+    const out=[];
+    for(const d of act(data.metricDefs)){const s=seriesFor(data,d.id);if(!s.length)continue;const l=s[s.length-1];const st=metricStatus(d,{value:l.v,value2:l.v2});
+      out.push('- '+d.name+': '+(d.pair&&l.v2!=null?l.v+'/'+l.v2:num(l.v,d.dec))+' '+d.unit+' on '+l.t+(st?' → '+st[0]:'')+(s.length>1?' · earlier '+num(s[0].v,d.dec)+' on '+s[0].t:''))}
+    const w=seriesFor(data,'weight'),wa=seriesFor(data,'waist');
+    if(P.heightIn&&w.length)out.push('- BMI '+num(703*w[w.length-1].v/(P.heightIn*P.heightIn),1)+(wa.length?' · waist÷height '+num(wa[wa.length-1].v/P.heightIn,2):''));
+    if(out.length){L.push('');L.push('## Body & habits tracked');L.push(...out)}
+  }
+  if(o.events){
+    const ev=act(data.events).filter(e=>e.date>=addDays(todayStr(),-365)).sort((a,b)=>a.date<b.date?-1:1);
+    if(ev.length){L.push('');L.push('## Changes in the last 12 months');ev.forEach(e=>L.push('- '+e.date+' ['+e.cat+'] '+e.title))}
+  }
+  if(o.advice){
+    const ns=act(data.notes).filter(n=>n.tag==='AI advice').slice(-10);
+    if(ns.length){L.push('');L.push('## Advice I saved from AI (with my outcome)');ns.forEach(n=>L.push('- '+(n.cleaned||n.text).replace(/\s+/g,' ').slice(0,300)+' ['+(n.status||'Not tried')+']'))}
+  }
+  if(o.doctor){
+    const ns=act(data.notes).filter(n=>n.tag==='Doctor');
+    if(ns.length){L.push('');L.push("## My doctor's guidance");ns.forEach(n=>L.push('- '+(n.cleaned||n.text).replace(/\s+/g,' ').slice(0,400)))}
+  }
+  if(o.foods){
+    const fs=act(data.foods);
+    if(fs.length){L.push('');L.push('## My own food list (my opinion, not verified)');
+      for(const [k,lab] of [['good','Foods I think are good for me'],['sometimes','Sometimes / unsure'],['limit','Foods I try to limit']]){const g=fs.filter(f=>f.status===k);if(g.length)L.push('- '+lab+': '+g.map(f=>f.name+(f.note?' ('+f.note+')':'')).join(', '))}}
+  }
+  if(o.eating){
+    const e=eatingSummary(data,14);
+    if(e.logged){L.push('');L.push('## How I ate, last 14 days (my own description, no portions measured)');
+      e.days.forEach(d=>{const p=SLOTS.map(([k,l])=>slotText(d.slots&&d.slots[k])?l+': '+slotText(d.slots[k]):'').filter(Boolean);if(p.length||d.note)L.push('- '+d.date+' — '+p.join(' · ')+(d.note?' · note: '+d.note:''))});
+      if(e.lines.length){L.push('Patterns: '+e.lines.join('; '))}}
+  }
+  L.push('');L.push('## Task');
+  L.push({food:'Is this food a good idea for me? [paste the food or meal here]. Say why in terms of my goals, and what you would change.',plan:'Build a 7-day meal plan for my goals with calories and macros per meal, a daily total, and a grocery list.',labs:'Interpret my labs and trends in plain language. List questions to ask my doctor.',compare:'Compare my own food list and my eating pattern against my labs and goals. For each food say supports / neutral / works against and why, in plain language. Point out foods on my list worth reconsidering, foods missing from it that fit my goals, and what my day-to-day pattern suggests changing first. Say clearly where you are unsure or where a clinician should weigh in.',free:'[Type your question here]'}[o.mode]||'[Type your question here]');
+  L.push('');L.push('Rules: label every number as an estimate; ask me if a portion is unclear; never invent lab values; do not tell me to start, stop or change any medication or supplement — say to ask my doctor; tell me when something needs a clinician.');
+  return L.join('\n');
+}
+
+
+/* ---------- food list + how I ate ---------- */
+const SLOTS=[['breakfast','Breakfast'],['lunch','Lunch'],['dinner','Dinner'],['late','Late / snacks']];
+const MEAL_TAGS=['Carb-heavy','Protein + veg','Balanced','Fried / fast food','Sweets','Light','Skipped','Alcohol'];
+const FOOD_STATUS=[['good','I think this is good for me'],['sometimes','Sometimes / unsure'],['limit','I try to limit this']];
+function parseFoodNames(t){const seen=new Set();return String(t||'').split(/[,\n;]+/).map(x=>x.trim().replace(/\s+/g,' ')).filter(x=>{const k=x.toLowerCase();if(!x||seen.has(k))return false;seen.add(k);return true})}
+function slotText(sl){if(!sl)return '';const b=[];if(sl.size&&sl.size!=='normal')b.push(sl.size);(sl.tags||[]).forEach(t=>b.push(t.toLowerCase()));return b.join(', ')}
+function eatingSummary(data,n){
+  n=n||14;const from=addDays(todayStr(),-(n-1));
+  const ds=act(data.days).filter(d=>d.date>=from).sort((a,b)=>a.date<b.date?-1:1);
+  const cnt=(slot,f)=>ds.filter(d=>d.slots&&d.slots[slot]&&f(d.slots[slot])).length;
+  const has=t=>s=>(s.tags||[]).includes(t);
+  const lines=[];
+  const late=cnt('late',s=>(s.tags||[]).length||s.size);
+  if(ds.length){
+    const lc=cnt('late',has('Carb-heavy'))+cnt('late',has('Sweets'));
+    if(lc)lines.push('Late-night carb-heavy or sweet eating on '+lc+' of '+ds.length+' logged days');
+    const bd=cnt('dinner',s=>s.size==='big');if(bd)lines.push('Big dinner on '+bd+' of '+ds.length+' days');
+    const bc=cnt('breakfast',has('Carb-heavy'));if(bc)lines.push('Carb-heavy breakfast on '+bc+' of '+ds.length+' days');
+    const pv=['breakfast','lunch','dinner'].reduce((a,k)=>a+cnt(k,s=>has('Protein + veg')(s)||has('Balanced')(s)),0);lines.push('Protein + veg or balanced meals logged: '+pv);
+    const sk=['breakfast','lunch','dinner'].reduce((a,k)=>a+cnt(k,has('Skipped')),0);if(sk)lines.push('Skipped meals: '+sk);
+  }
+  return {logged:ds.length,days:ds,lines,late};
+}
+
+/* ---------- misc ---------- */
+function strengthHint(p){
+  if(p.length<10)return {ok:false,msg:'Use at least 10 characters. A few random words works well.'};
+  return {ok:true,msg:p.length<16?'OK. A longer phrase is stronger.':'Strong.'};
+}
+
+</script>
+<script>
+'use strict';
+/* =====================================================================
+   Health Log — interface. Everything runs on this device.
+   Only the encrypted vault is ever written to IndexedDB. No network calls.
+   ===================================================================== */
+
+/* ---------- storage ---------- */
+const DBNAME='healthlog';let _db=null;
+const dbOpen=()=>new Promise((res,rej)=>{if(!window.indexedDB)return rej(new Error('Storage is not available in this browser mode'));const r=indexedDB.open(DBNAME,1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>{_db=r.result;res(_db)};r.onerror=()=>rej(r.error)});
+const dbTx=(mode,fn)=>new Promise((res,rej)=>{const t=_db.transaction('kv',mode);const q=fn(t.objectStore('kv'));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error)});
+const dbGet=k=>dbTx('readonly',s=>s.get(k));
+const dbPut=(k,v)=>dbTx('readwrite',s=>s.put(v,k));
+
+/* ---------- state ---------- */
+const CATS=['Food','Training','Meds','Protocol','Life'];
+const A={mode:null,env:null,mk:null,master:null,data:null,locked:true,tab:'home',animate:false,homePage:'pin',cust:false,
+  tl:{key:null,range:'1y',cats:CATS.slice()},labRange:'1y',noteFilter:'All',askMode:'food',
+  askInc:{profile:true,goals:true,labs:true,body:true,events:true,advice:true,doctor:true,foods:true,eating:true},
+  saveTimer:null,idleTimer:null,hiddenAt:0,passkeyOk:false};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const root=$('#root');
+const N=v=>{const x=parseFloat(String(v).replace(',','.'));return isNaN(x)?null:x};
+const chip=(l,t)=>`<span class="chip ${t||''}">${esc(l)}</span>`;
+const card=(t,b,c)=>`<section class="card ${c||''}"><h3>${t}</h3>${b}</section>`;
+const D=()=>A.data;
+
+function mutate(fn,o){fn(A.data);scheduleSave();if(!o||o.render!==false)draw()}
+function scheduleSave(){if(A.mode!=='device')return;clearTimeout(A.saveTimer);A.saveTimer=setTimeout(saveNow,250)}
+async function saveNow(){
+  clearTimeout(A.saveTimer);
+  if(A.mode!=='device'||!A.mk||!A.data)return;
+  try{await sealData(A.env,A.mk,A.data);await dbPut('vault',A.env)}catch(e){toast('Could not save: '+(e.message||e))}
+}
+
+/* ---------- small UI helpers ---------- */
+let toastT;
+function toast(msg,undo){
+  clearTimeout(toastT);const old=$('.toast');if(old)old.remove();
+  const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');
+  t.innerHTML=`<span>${esc(msg)}</span>${undo?'<button data-a="toast-undo">Undo</button>':''}`;
+  t._undo=undo;document.body.appendChild(t);toastT=setTimeout(()=>t.remove(),undo?12000:4500);
+}
+function dlg(title,body,o){
+  o=o||{};
+  const d=document.createElement('dialog');
+  d.innerHTML=`<form class="dlgf" novalidate><h3>${title}</h3><div class="dlgb">${body}</div><div class="err" role="alert"></div><div class="row dlgr">${o.noCancel?'':`<button type="button" class="btn ghost" data-close>${o.cancel||'Cancel'}</button>`}${o.hideOk?'':`<button type="submit" class="btn ${o.danger?'danger':''}">${o.ok||'Save'}</button>`}</div></form>`;
+  document.body.appendChild(d);
+  const f=d.querySelector('form');
+  f.addEventListener('submit',async e=>{
+    e.preventDefault();const b=f.querySelector('[type=submit]');if(b)b.disabled=true;
+    try{const r=o.onOk?await o.onOk(d,f):undefined;if(r===false){if(b)b.disabled=false;return}d.close()}
+    catch(err){d.querySelector('.err').textContent=err.message||String(err);if(b)b.disabled=false}
+  });
+  d.addEventListener('click',e=>{if(e.target.closest('[data-close]'))d.close()});
+  d.addEventListener('close',()=>{if(o.onClose)o.onClose();d.remove()});
+  d.showModal();
+  if(!o.noFocus){const first=d.querySelector('input:not([type=hidden]):not([type=checkbox]):not([type=radio]),select,textarea');if(first)first.focus()}
+  return d;
+}
+const dErr=(d,m)=>{d.querySelector('.err').textContent=m;return false};
+const val=(d,id)=>{const e=d.querySelector('#'+id);return e?e.value:''};
+function options(list,sel){return list.map(([v,l])=>`<option value="${esc(v)}"${String(v)===String(sel)?' selected':''}>${esc(l)}</option>`).join('')}
+const measureOptions=sel=>`<optgroup label="Lab results">${options(testKeys().map(k=>[k,TESTS[k].name]),sel)}</optgroup><optgroup label="Body &amp; habits tracked">${options(act(D().metricDefs).map(m=>[m.id,m.name]),sel)}</optgroup>`;
+
+/* ---------- charts ---------- */
+const RANGES=[['3m',90],['6m',180],['1y',365],['all',0]];
+function windowFor(range,dates){
+  let to=todayStr();if(dates.length){const mx=dates.reduce((a,b)=>a>b?a:b);if(mx>to)to=mx}
+  const days=RANGES.find(r=>r[0]===range)[1];let from;
+  if(days)from=addDays(to,-days);else from=dates.length?dates.reduce((a,b)=>a<b?a:b):addDays(to,-365);
+  if(from>=to)from=addDays(to,-30);
+  return {from,to};
+}
+function chartHTML(o){
+  const W=o.w||560,H=o.h||200,ev=o.events||[],P={l:40,r:14,t:ev.length?26:12,b:26};
+  const a=dayNum(o.from),b=dayNum(o.to),span=Math.max(1,b-a);
+  const pts=o.pts.filter(p=>p.t>=o.from&&p.t<=o.to);
+  if(!pts.length)return '<div class="empty">No readings in this period.</div>';
+  const ys=pts.map(p=>p.v);if(o.ref!=null)ys.push(o.ref);
+  let lo=Math.min(...ys),hi=Math.max(...ys);if(hi===lo){hi+=1;lo-=1}const pad=(hi-lo)*.14;lo-=pad;hi+=pad;
+  const sx=t=>P.l+(dayNum(t)-a)/span*(W-P.l-P.r),sy=v=>P.t+(1-(v-lo)/(hi-lo))*(H-P.t-P.b);
+  const tick=v=>(hi-lo)<8?v.toFixed(1):String(Math.round(v));
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(o.label||'chart')}" style="display:block">`;
+  for(let i=0;i<4;i++){const v=lo+(hi-lo)*i/3,y=sy(v);s+=`<line class="gl" x1="${P.l}" x2="${W-P.r}" y1="${y}" y2="${y}"/><text x="${P.l-6}" y="${y+3}" text-anchor="end">${tick(v)}</text>`}
+  for(let i=0;i<4;i++){const t=addDays(o.from,Math.round(span*i/3));const [Y,M,Dd]=t.split('-').map(Number);const lab=span>200?MON[M-1]+' ’'+String(Y).slice(2):MON[M-1]+' '+Dd;s+=`<text x="${P.l+(W-P.l-P.r)*i/3}" y="${H-7}" text-anchor="${i===0?'start':i===3?'end':'middle'}">${lab}</text>`}
+  if(o.ref!=null)s+=`<line class="refl" x1="${P.l}" x2="${W-P.r}" y1="${sy(o.ref)}" y2="${sy(o.ref)}"/><text x="${W-P.r}" y="${sy(o.ref)-5}" text-anchor="end" style="fill:var(--good)">${esc(o.refLabel||'target')} ${o.ref}</text>`;
+  ev.forEach((e,i)=>{const x=sx(e.date);s+=`<line class="ev" x1="${x}" x2="${x}" y1="${P.t}" y2="${H-P.b}"/><circle class="evc" cx="${x}" cy="${P.t-9}" r="8"/><text class="evt" x="${x}" y="${P.t-6}" text-anchor="middle">${i+1}</text>`});
+  if(pts.length>1)s+=`<path class="ln draw" pathLength="1" d="${pts.map((p,i)=>(i?'L':'M')+sx(p.t).toFixed(1)+' '+sy(p.v).toFixed(1)).join(' ')}"/>`;
+  if(pts.length<=60)pts.forEach(p=>{s+=`<circle class="dotp" cx="${sx(p.t)}" cy="${sy(p.v)}" r="4"/>`});
+  return s+'</svg>';
+}
+function spark(pts){
+  pts=pts.slice(-12);if(pts.length<2)return '';
+  const ys=pts.map(p=>p.v),lo=Math.min(...ys),hi=Math.max(...ys),r=(hi-lo)||1;
+  const a=dayNum(pts[0].t),b=dayNum(pts[pts.length-1].t),sp=Math.max(1,b-a);
+  return `<svg viewBox="0 0 100 30" width="100%" style="display:block;max-width:150px;height:auto" aria-hidden="true"><path class="ln draw" style="stroke-width:2.5" pathLength="1" d="${pts.map((p,i)=>(i?'L':'M')+((dayNum(p.t)-a)/sp*96+2).toFixed(1)+' '+(28-(p.v-lo)/r*26).toFixed(1)).join(' ')}"/></svg>`;
+}
+const rangeChips=(cur,act_)=>`<div class="seg sm" role="group" aria-label="Time range">${RANGES.map(([k])=>`<button data-a="${act_}" data-v="${k}" aria-pressed="${cur===k}">${k==='all'?'All':k}</button>`).join('')}</div>`;
+const ringHTML=(pct,label,sub)=>`<div class="fast"><svg class="ring" viewBox="0 0 120 120" role="img" aria-label="${esc(label)}"><circle class="bg" cx="60" cy="60" r="46" pathLength="100"/><circle class="fg" style="--p:${Math.round(Math.max(0,Math.min(100,pct)))}" cx="60" cy="60" r="46" pathLength="100"/></svg><div><b class="mono">${esc(label)}</b><span class="mut">${sub}</span></div></div>`;
+
+/* ---------- shell & routing ---------- */
+const TABS=[['home','Home'],['goals','Goals'],['labs','Labs'],['changes','What changed'],['track','Track'],['notes','Notes'],['ask','Ask AI']];
+const BTABS=[['home','Home'],['goals','Goals'],['labs','Labs'],['track','Track'],['more','More']];
+const ICON={home:'M3 11l9-8 9 8v10h-6v-6H9v6H3z',goals:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z',labs:'M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3',track:'M3 17l6-6 4 4 8-8M15 7h6v6',more:'M5 12h.01M12 12h.01M19 12h.01'};
+const ico=n=>`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICON[n]}"/></svg>`;
+const VIEWS={};
+function draw(){
+  if(A.locked||!A.data)return;
+  const cur=A.tab,mobileActive=['changes','notes','ask','settings','more'].includes(cur)?'more':cur;
+  const titles={...Object.fromEntries(TABS),settings:'Settings',more:'More'};
+  root.innerHTML=`${A.mode==='session'?'<div class="banner">Session only — nothing is saved on this device. Export a backup before you close this page.</div>':''}
+  <div class="app"><nav class="nav" aria-label="Sections">${TABS.map(([id,l])=>`<button class="nb" data-a="go" data-v="${id}" ${cur===id?'aria-current="page"':''}>${l}</button>`).join('')}<button class="nb" data-a="go" data-v="settings" aria-label="Settings" ${cur==='settings'?'aria-current="page"':''}>Settings</button></nav>
+  <main class="${A.animate?'anim':''}"><h2 class="vt">${titles[cur]||''}</h2>${VIEWS[cur]?VIEWS[cur]():''}</main></div>
+  <nav class="bnav" aria-label="Sections">${BTABS.map(([id,l])=>`<button data-a="go" data-v="${id}" ${mobileActive===id?'aria-current="page"':''}>${ico(id)}<span>${l}</span></button>`).join('')}</nav>`;
+  if(A.animate){$$('main .card,main .tile').forEach((el,i)=>el.style.setProperty('--i',i));A.animate=false}
+  afterDraw();
+}
+function go(tab){A.tab=tab;A.animate=true;A.cust=false;draw();window.scrollTo(0,0)}
+function afterDraw(){
+  const p=$('#persist');if(p&&navigator.storage&&navigator.storage.persisted)navigator.storage.persisted().then(v=>{p.textContent=v?'Yes — the browser has agreed to keep it.':'Not guaranteed. Install to the Home Screen and keep backups.'}).catch(()=>{});
+}
+
+/* ---------- HOME ---------- */
+function goalBlock(g,big){
+  const p=goalProgress(g,D());
+  return `${big?`<p class="goalt">${esc(g.title)}</p><div class="bl"><span class="mono">${esc(p.detail)}</span><span class="mut">${esc(p.target||'')}</span></div>`:`<div class="bl" style="margin-top:10px"><b>${esc(g.title)}</b>${chip(p.words,p.tone)}</div>`}
+  ${p.pct!=null?`<div class="bar"><i style="--w:${Math.round(p.pct*100)}%"></i></div>`:''}
+  ${big?`<div class="chips" style="margin-bottom:8px">${chip(p.words,p.tone)}${p.asOf?`<span class="mut" style="font-size:12.5px;align-self:center">as of ${fmtDate(p.asOf)}</span>`:''}</div>`:''}
+  ${g.nextStep?`<p style="font-size:14px"><b>Next:</b> ${esc(g.nextStep)}</p>`:''}`;
+}
+const primaryGoal=()=>{const gs=act(D().goals);return gs.find(g=>g.primary)||gs[0]};
+const activeFast=()=>act(D().fasts).find(f=>!f.end);
+function fastCard(){
+  const f=activeFast(),goal=D().settings.fastGoal||16;
+  if(f){const h=(Date.now()-Date.parse(f.start))/3600000;const hh=Math.floor(h),mm=Math.floor((h-hh)*60);
+    return ringHTML(h/goal*100,hh+'h '+pad2(mm)+'m','of a '+goal+'h fast')+`<div class="row"><button class="btn" data-a="fast-end">End fast</button></div>`}
+  const last=act(D().fasts).filter(x=>x.end).sort((a,b)=>a.end<b.end?1:-1)[0];
+  return `<p class="mut">${last?'Last fast: <b class="mono">'+fmtDur(Date.parse(last.end)-Date.parse(last.start))+'</b> ('+daysAgoText(last.end.slice(0,10))+').':'No fast running.'}</p><div class="row"><button class="btn" data-a="fast-start">Start a fast</button><button class="btn ghost" data-a="fast-goal">Goal: ${goal}h</button></div>`;
+}
+const fmtDur=ms=>{const h=ms/3600000;return Math.floor(h)+'h '+pad2(Math.floor((h%1)*60))+'m'};
+const HC={
+  goals:{t:'Current goals',cls:'span2 rs2',r:()=>{const gs=act(D().goals);if(!gs.length)return `<p class="mut">Pick one thing to work toward. You can add more later.</p><div class="row"><button class="btn" data-a="goal-new">Set a goal</button></div>`;const p=primaryGoal();return goalBlock(p,true)+gs.filter(g=>g.id!==p.id).slice(0,2).map(g=>goalBlock(g,false)).join('')+`<div class="row"><button class="btn ghost" data-a="go" data-v="goals">All goals</button></div>`}},
+  today:{t:'Today',r:fastCard},
+  upcoming:{t:'Upcoming',r:()=>{
+    const d=D(),items=[];const labs=act(d.labs).map(l=>l.date).sort();
+    if(labs.length){const last=labs[labs.length-1],nx=addDays(last,d.settings.retestDays||90),left=dayNum(nx)-dayNum(todayStr());items.push(`<li><span><b>Labs</b><br><span class="mut">last ${fmtDate(last)} · next suggested ${left>0?'around '+fmtDate(nx,false):'now'}</span></span></li>`)}
+    else items.push(`<li><span><b>Labs</b><br><span class="mut">none yet</span></span><button class="btn ghost sm" data-a="go" data-v="labs">Add</button></li>`);
+    if(d.settings.doctorVisit){const left=dayNum(d.settings.doctorVisit)-dayNum(todayStr());items.push(`<li><span><b>Doctor visit</b><br><span class="mut">${fmtDate(d.settings.doctorVisit)}${left>=0?' · in '+left+' days':''}</span></span></li>`)}
+    else items.push(`<li><span><b>Doctor visit</b><br><span class="mut">not set</span></span><button class="btn ghost sm" data-a="set-visit">Set</button></li>`);
+    const lb=d.settings.lastBackup,recs=act(d.labs).length+act(d.readings).length+act(d.notes).length;
+    if(A.mode==='device'&&((!lb&&recs>=5)||(lb&&dayNum(todayStr())-dayNum(lb)>=30)))items.push(`<li><span><b>Backup</b><br><span class="mut">${lb?'last one '+daysAgoText(lb):'none yet'}</span></span><button class="btn ghost sm" data-a="backup-open">Back up</button></li>`);
+    return `<ul class="plain">${items.join('')}</ul>`}},
+  quick:{t:'Quick log',r:()=>`<div class="qlog"><button class="btn ghost" data-a="reading-new" data-v="weight">+ Weight</button><button class="btn ghost" data-a="reading-new" data-v="bp">+ Blood pressure</button><button class="btn ghost" data-a="reading-new" data-v="sleep">+ Sleep</button><button class="btn ghost" data-a="event-new">+ Change</button></div>`},
+  habits:{t:'This week — habits',cond:()=>act(D().goals).some(g=>g.type==='habit'),r:()=>act(D().goals).filter(g=>g.type==='habit').map(g=>{const p=goalProgress(g,D()),logged=act(D().habitLogs).some(h=>h.goal===g.id&&h.date===todayStr());return `<div class="bl"><span>${esc(g.title)}</span><span class="mut mono">${p.detail}</span></div><div class="bar"><i style="--w:${Math.round(p.pct*100)}%"></i></div><button class="btn ghost sm" data-a="habit-log" data-v="${g.id}">${logged?'Undo today':'+ Log today'}</button>`}).join('<div style="height:12px"></div>')},
+  weight:{t:'Weight',cond:()=>seriesFor(D(),'weight').length>0,r:()=>{const s=seriesFor(D(),'weight'),l=s[s.length-1];return `<div class="fast"><div><b class="big">${num(l.v,1)}</b><span class="mut"> lb</span><br><span class="mut" style="font-size:12.5px">${fmtDate(l.t,false)} · ${daysAgoText(l.t)}</span></div><div style="flex:1 1 90px;min-width:90px">${spark(s)}</div></div>`}},
+  checkin:{t:'Check-in',r:()=>{const c=act(D().checkins).find(x=>x.date===todayStr())||{};return ['energy','hunger','sleepq'].map((k,i)=>{const n=['Energy','Hunger','Sleep quality'][i];return `<div class="bl" style="align-items:center;margin-bottom:8px"><span>${n}</span><span class="scale" role="radiogroup" aria-label="${n}, 1 to 5">${[1,2,3,4,5].map(v=>`<label><input type="radio" name="ck-${k}" value="${v}" ${c[k]===v?'checked':''} aria-label="${n} ${v}"><span>${v}</span></label>`).join('')}</span></div>`}).join('')+`<p class="note">10 seconds. Helps explain why a week felt good or bad.</p><div class="row"><button class="btn ghost" data-a="checkin-save">Save</button><span class="mut" id="ckmsg" aria-live="polite" style="font-size:13px"></span></div>`}},
+  notes:{t:'Notes inbox',cond:()=>act(D().notes).length>0,r:()=>{const ns=act(D().notes).sort((a,b)=>a.updatedAt<b.updatedAt?1:-1),tr=ns.filter(n=>n.status==='To try').length;return `<p><b>${ns.length} saved</b>${tr?' · '+tr+' marked to try':''}</p><p class="mut" style="font-size:13.5px">Latest: “${esc(ns[0].text.slice(0,80))}${ns[0].text.length>80?'…':''}”</p><div class="row"><button class="btn ghost" data-a="go" data-v="notes">Open notes</button></div>`}},
+  doctorq:{t:'Questions for your doctor',cond:()=>act(D().questions).some(q=>!q.done),r:()=>`<ul class="plain">${act(D().questions).filter(q=>!q.done).slice(0,4).map(q=>`<li><span>${esc(q.text)}</span></li>`).join('')}</ul><div class="row"><button class="btn ghost" data-a="go" data-v="notes">Open</button></div>`},
+  labs:{t:'Labs',r:()=>{const d=D(),ls=act(d.labs);if(!ls.length)return `<p class="mut">No results yet.</p><div class="row"><button class="btn" data-a="go" data-v="labs">Add results</button></div>`;const last=ls.map(l=>l.date).sort().pop();const peek=d.settings.peek?testKeys().filter(k=>seriesFor(d,k).length).slice(0,3).map(k=>{const s=seriesFor(d,k),l=s[s.length-1];return `<div class="bl" style="margin:6px 0"><span>${TESTS[k].name}</span><span><b class="mono">${num(l.v,TESTS[k].dec)}</b> ${chip(...TESTS[k].fn(l.v))}</span></div>`}).join(''):'';
+    return `<div class="bl"><b>Last panel: ${fmtDate(last,false)}</b><span class="mut">${daysAgoText(last)}</span></div><p class="note">Older results show their date, never an alert.</p><label class="sw"><input type="checkbox" data-c="peek" ${d.settings.peek?'checked':''}> Show lab status on Home</label>${peek}<div class="row"><button class="btn ghost" data-a="go" data-v="labs">Open labs</button></div>`}}
+};
+const visible=id=>!HC[id].cond||HC[id].cond();
+function homeBar(){
+  const h=D().settings.home;
+  if(A.cust)return `<b>Customize Home</b><button class="btn" data-a="home-page" data-v="done">Done</button>`;
+  const n=w=>h.order.filter(id=>h.where[id]===w&&visible(id)).length;
+  return `<div class="seg" role="group" aria-label="Home page"><button data-a="home-page" data-v="pin" aria-pressed="${A.homePage==='pin'}">Pinned (${n('pin')})</button><button data-a="home-page" data-v="more" aria-pressed="${A.homePage==='more'}">More (${n('more')})</button></div><button class="btn ghost" data-a="home-page" data-v="cust">Customize</button>`;
+}
+function homeBody(){
+  const d=D(),h=d.settings.home;
+  if(A.cust){
+    const pinned=h.order.filter(id=>h.where[id]==='pin'&&visible(id)).length;
+    return `<div class="stack">${card('Your cards',`<ul class="plain">${h.order.map((id,i)=>`<li class="crow"><span class="cn">${HC[id].t}${HC[id].cond&&!visible(id)?' <span class="mut" style="font-weight:400;font-size:12px">(shows when you have some)</span>':''}</span><span class="seg sm" role="group" aria-label="${HC[id].t}">${[['pin','Pinned'],['more','More'],['hide','Hidden']].map(([w,l])=>`<button data-a="home-where" data-v="${id}:${w}" aria-pressed="${h.where[id]===w}">${l}</button>`).join('')}</span><span class="row" style="margin:0;gap:4px"><button class="ib" aria-label="Move ${HC[id].t} up" data-a="home-move" data-v="${id}:-1" ${i===0?'disabled':''}>↑</button><button class="ib" aria-label="Move ${HC[id].t} down" data-a="home-move" data-v="${id}:1" ${i===h.order.length-1?'disabled':''}>↓</button></span></li>`).join('')}</ul><p class="note">${pinned} pinned. About 6 or fewer fits one screen without scrolling.</p>`)}</div>`;
+  }
+  const first=!act(d.goals).length&&!act(d.labs).length&&!act(d.readings).length;
+  if(first)return `<div class="grid"><section class="card span4"><h3>Start here</h3><p>Three small steps make this page useful. Everything stays on this device.</p><ul class="plain" style="margin-top:12px"><li><span><b>1. Add your height</b><br><span class="mut">Optional. Used for BMI and waist ÷ height.</span></span><button class="btn ghost sm" data-a="go" data-v="settings">Settings</button></li><li><span><b>2. Set a goal</b><br><span class="mut">For example: LDL under 100, or lose fat and keep muscle.</span></span><button class="btn sm" data-a="goal-new">Set a goal</button></li><li><span><b>3. Add lab results</b><br><span class="mut">Paste the text from your lab report and review it.</span></span><button class="btn ghost sm" data-a="go" data-v="labs">Add results</button></li></ul></section></div>`;
+  const ids=h.order.filter(id=>h.where[id]===A.homePage&&visible(id));
+  if(!ids.length)return `<div class="empty">Nothing on this page yet. Use Customize to move cards here.</div>`;
+  return `<div class="grid">${ids.map(id=>card(HC[id].t,HC[id].r(),HC[id].cls||'')).join('')}</div>`;
+}
+VIEWS.home=()=>{const first=!act(D().goals).length&&!act(D().labs).length&&!act(D().readings).length;return `${first?'':`<div class="hbar" id="hbar">${homeBar()}</div>`}<div id="homebody">${homeBody()}</div>`};
+function refreshHome(){const b=$('#hbar');if(b)b.innerHTML=homeBar();const hb=$('#homebody');if(hb)hb.innerHTML=homeBody()}
+
+/* ---------- GOALS ---------- */
+function goalCard(g){
+  const p=goalProgress(g,D());
+  const logged=g.type==='habit'&&act(D().habitLogs).some(h=>h.goal===g.id&&h.date===todayStr());
+  return `<section class="card"><div class="bl"><h3 style="margin:0">${esc(GOAL_TYPES[g.type])}${g.setBy==='doctor'?' · set by doctor':''}</h3>${g.primary?chip('Primary','mut'):''}</div>
+  <p class="goalt" style="margin-top:8px">${esc(g.title)}</p>
+  <div class="bl"><span class="mono">${esc(p.detail)}</span><span class="mut">${esc(p.target||'')}</span></div>
+  ${p.pct!=null?`<div class="bar"><i style="--w:${Math.round(p.pct*100)}%"></i></div>`:''}
+  <div class="chips">${chip(p.words,p.tone)}${p.asOf?`<span class="mut" style="font-size:12.5px;align-self:center">as of ${fmtDate(p.asOf)}</span>`:''}</div>
+  ${g.nextStep?`<p style="margin-top:10px"><b>Next:</b> ${esc(g.nextStep)}</p>`:''}
+  <div class="row">${g.type==='habit'?`<button class="btn sm" data-a="habit-log" data-v="${g.id}">${logged?'Undo today':'+ Log today'}</button>`:''}<button class="btn ghost sm" data-a="goal-edit" data-v="${g.id}">Edit</button><button class="btn ghost sm" data-a="goal-del" data-v="${g.id}">Delete</button></div></section>`;
+}
+VIEWS.goals=()=>{
+  const d=D(),gs=act(d.goals).sort((a,b)=>(b.primary?1:0)-(a.primary?1:0));
+  const labs=act(d.labs).map(l=>l.date).sort(),lb=d.settings.lastBackup;
+  const tracked=act(d.metricDefs).map(m=>{const s=seriesFor(d,m.id);if(!s.length)return null;const l=s[s.length-1];return m.name+' '+(m.pair&&l.v2!=null?l.v+'/'+l.v2:num(l.v,m.dec))+' '+m.unit}).filter(Boolean);
+  return `<div class="stack">${card('Where things stand',`<ul class="plain"><li><span><b>Goals</b><br><span class="mut">${gs.length?gs.length+' active'+(primaryGoal()?' · primary: '+esc(primaryGoal().title):''):'none yet'}</span></span></li><li><span><b>Latest labs</b><br><span class="mut">${labs.length?fmtDate(labs[labs.length-1])+' ('+daysAgoText(labs[labs.length-1])+')':'none yet'}</span></span></li><li><span><b>Tracking</b><br><span class="mut">${tracked.length?esc(tracked.join(' · ')):'nothing yet'}</span></span></li><li><span><b>Last backup</b><br><span class="mut">${A.mode==='session'?'session only — not saved':lb?fmtDate(lb)+' ('+daysAgoText(lb)+')':'none yet'}</span></span></li></ul><p class="note">Status words come from your own numbers and general ranges. They are not medical advice.</p>`)}
+  <div class="hbar" style="margin:0"><h3 style="font-size:16px">Your goals</h3><button class="btn" data-a="goal-new">+ Add a goal</button></div>
+  ${gs.length?`<div class="g2">${gs.map(goalCard).join('')}</div>`:`<div class="empty">No goals yet. A goal can be a lab target, a range to stay in, a direction, or a weekly habit.</div>`}</div>`;
+};
+function goalDialog(g){
+  const edit=!!g;g=g||{type:'target',setBy:'me',baseline:'first'};
+  const html=`<div class="fld">What kind of goal?<select id="gtype">${options(Object.entries(GOAL_TYPES),g.type)}</select></div>
+  <p class="note" id="gtypehelp" style="margin:-6px 0 12px"></p>
+  <div class="fld">Name<input class="inp" id="gtitle" value="${esc(g.title||'')}" placeholder="e.g. LDL under 100" maxlength="80"></div>
+  <div class="fld" data-for="target range direction">Measured by<select id="gkey">${measureOptions(g.key||'ldl')}</select></div>
+  <div class="fld2" data-for="target direction"><div class="fld">Target${g.type==='direction'?' (optional)':''}<input class="inp" id="gtarget" inputmode="decimal" value="${g.target!=null?g.target:''}"></div><div class="fld" data-for="direction">Direction<select id="gdir">${options([['down','Going down'],['up','Going up']],g.dir||'down')}</select></div></div>
+  <div class="fld2" data-for="range"><div class="fld">Low (optional)<input class="inp" id="glo" inputmode="decimal" value="${g.lo!=null?g.lo:''}"></div><div class="fld">High (optional)<input class="inp" id="ghi" inputmode="decimal" value="${g.hi!=null?g.hi:''}"></div></div>
+  <div class="fld" data-for="target direction">Measure progress from<select id="gbase">${options([['first','My first result'],['latest','My latest result right now']],g.baseline||'first')}</select></div>
+  <div class="fld" data-for="habit">Times per week<input class="inp" id="gn" inputmode="numeric" value="${g.habitN||3}"></div>
+  <div class="fld2"><div class="fld">Set by<select id="gby">${options([['me','Me'],['doctor','My doctor']],g.setBy)}</select></div><div class="fld">&nbsp;<label class="sw" style="margin:0;min-height:44px;align-items:center"><input type="checkbox" id="gprim" ${g.primary||(!act(D().goals).length&&!edit)?'checked':''}> Primary goal</label></div></div>
+  <div class="fld">Next step (optional)<input class="inp" id="gnext" value="${esc(g.nextStep||'')}" placeholder="e.g. Retest around Feb 10" maxlength="120"></div>`;
+  const help={target:'Move a number to a target, like LDL under 100.',range:'Keep a number inside a range, or under or over a limit, like blood pressure.',direction:'Move a number up or down, like losing fat. A target is optional.',habit:'Do something a set number of times each week, like training.'};
+  const d=dlg(edit?'Edit goal':'New goal',html,{ok:edit?'Save':'Add goal',onOk:(dd)=>{
+    const type=val(dd,'gtype'),key=val(dd,'gkey');
+    let title=val(dd,'gtitle').trim();
+    const o={type,title,setBy:val(dd,'gby'),nextStep:val(dd,'gnext').trim(),primary:dd.querySelector('#gprim').checked};
+    if(type==='habit'){const n=Math.round(N(val(dd,'gn'))||0);if(n<1||n>14)return dErr(dd,'Enter 1 to 14 times per week.');o.habitN=n}
+    else{o.key=key;
+      if(type==='range'){o.lo=N(val(dd,'glo'));o.hi=N(val(dd,'ghi'));if(o.lo==null&&o.hi==null)return dErr(dd,'Enter a low, a high, or both.');if(o.lo!=null&&o.hi!=null&&o.lo>=o.hi)return dErr(dd,'Low must be below high.')}
+      else{const t=N(val(dd,'gtarget'));if(type==='target'&&t==null)return dErr(dd,'Enter a target number.');o.target=t;if(type==='direction')o.dir=val(dd,'gdir');o.baseline=val(dd,'gbase');
+        if(o.baseline==='latest'){const s=seriesFor(D(),key);o.startValue=s.length?s[s.length-1].v:null;o.startDate=todayStr();if(o.startValue==null)o.baseline='first'}}}
+    if(!title){title=type==='habit'?'Habit':measureName(D(),key)+' goal';o.title=title}
+    mutate(x=>{if(o.primary)act(x.goals).forEach(g2=>{if(!edit||g2.id!==g.id){g2.primary=false;stamp(g2)}});
+      if(edit){const keep={};if(g.baseline===o.baseline&&g.startValue!=null&&o.baseline==='latest'&&g.key===o.key){keep.startValue=g.startValue;keep.startDate=g.startDate}
+        const rec=x.goals.find(r=>r.id===g.id);['lo','hi','target','dir','habitN','key','startValue','startDate','baseline'].forEach(k=>delete rec[k]);Object.assign(rec,o,keep);stamp(rec)}
+      else addRec(x,'goals',o)});
+    toast(edit?'Goal saved':'Goal added');
+  }});
+  const sync=()=>{const t=val(d,'gtype');d.querySelectorAll('[data-for]').forEach(e=>e.classList.toggle('hidden',!e.dataset.for.split(' ').includes(t)));d.querySelector('#gtypehelp').textContent=help[t]};
+  d.addEventListener('change',e=>{if(e.target.id==='gtype')sync()});sync();
+}
+
+/* ---------- LABS ---------- */
+function labCard(k){
+  const s=seriesFor(D(),k),l=s[s.length-1],T=TESTS[k],ge=T.fn(l.v);
+  const lr=parseRange(l.range),inr=inRange(l.v,lr);
+  const {from,to}=windowFor(A.labRange,s.map(p=>p.t));
+  return `<section class="card"><h3>${T.name}</h3><div class="bl" style="align-items:center"><b class="big" style="font-size:26px">${num(l.v,T.dec)} <small class="mut" style="font-size:12px;font-weight:400">${T.unit}</small></b>${chip(ge[0],ge[1])}</div>
+  <p class="mut" style="font-size:12.5px;margin:4px 0 6px">${fmtDate(l.t)} · ${daysAgoText(l.t)}<br>General: ${T.general}${l.range?'<br>Lab range: '+esc(l.range)+(inr===false?' · outside':inr?' · inside':''):''}</p>
+  ${chartHTML({pts:s,ref:T.ref,refLabel:T.refLabel,from,to,w:360,h:140,label:T.name+' over time'})}
+  <div class="row"><button class="btn ghost sm" data-a="lab-details" data-v="${k}">All results (${s.length})</button></div></section>`;
+}
+VIEWS.labs=()=>{
+  const d=D(),ks=testKeys().filter(k=>seriesFor(d,k).length),imps=act(d.imports).sort((a,b)=>a.at<b.at?1:-1);
+  return `<div class="stack">${card('Add results',`<p class="mut" style="font-size:14px">Copy the text from your lab report or patient portal and paste it here. You will review everything before anything is saved.</p><textarea id="paste" aria-label="Paste lab text" placeholder="Paste lab text here"></textarea><div class="row"><button class="btn" data-a="lab-read">Read results</button><button class="btn ghost" data-a="lab-add">Add one by hand</button><span class="err" id="pasteerr" style="margin:0"></span></div>`)}
+  ${ks.length?`<div class="hbar" style="margin:0"><h3 style="font-size:16px">Your results</h3>${rangeChips(A.labRange,'lab-range')}</div><div class="g3">${ks.map(labCard).join('')}</div>`:`<div class="empty">No results yet. Paste a report above to get started.</div>`}
+  ${imps.length?card('Import history',`<ul class="plain">${imps.map(i=>`<li><span><b>${fmtDate(i.date)}</b><br><span class="mut">${i.count} result${i.count===1?'':'s'} · added ${fmtDate(i.at.slice(0,10))}</span></span><button class="btn ghost sm" data-a="import-remove" data-v="${i.id}">Remove import</button></li>`).join('')}</ul>`):''}</div>`;
+};
+function labReview(text){
+  const r=parseLabText(text);
+  if(!r.rows.length){$('#pasteerr').textContent='No known tests found. Check the text, or add results by hand.';return}
+  $('#pasteerr').textContent='';
+  const date=r.date||todayStr(),have=new Set(act(D().labs).map(l=>l.test+'|'+l.date+'|'+l.value));
+  const body=`<p class="mut" style="font-size:14px">Check each value against your report. Nothing is saved until you press Save.${r.date?'':' No date was found in the text, so today is filled in. Change it if needed.'}</p>
+  <div class="fld" style="margin-top:10px">Date of the test<input class="inp" type="date" id="rdate" value="${date}"></div>
+  <div class="tbl"><table><tr><th></th><th>Test</th><th>Value</th><th></th></tr>${r.rows.map((x,i)=>{const dup=have.has(x.test+'|'+date+'|'+x.value);return `<tr><td><input type="checkbox" id="rc${i}" ${dup?'':'checked'} aria-label="Include ${TESTS[x.test].name}"></td><td>${TESTS[x.test].name}${x.note?`<br><span class="mut" style="font-size:12px">${esc(x.note)}</span>`:''}${dup?'<br><span class="mut" style="font-size:12px">already saved</span>':''}</td><td style="min-width:110px"><input class="inp" id="rv${i}" inputmode="decimal" value="${x.value}" style="min-height:40px;padding:6px 8px"> <span class="mut" style="font-size:12px">${x.unit}</span>${x.range?`<br><span class="mut" style="font-size:12px">lab range ${esc(x.range)}</span>`:''}</td><td></td></tr>`}).join('')}</table></div>
+  <label class="sw"><input type="checkbox" id="rkeep" checked> Keep the original pasted text in Notes (locked), so I can check numbers later</label>`;
+  dlg('Review results',body,{ok:'Save these',cancel:'Discard',onOk:(dd)=>{
+    const dt=val(dd,'rdate');if(!/^\d{4}-\d{2}-\d{2}$/.test(dt))return dErr(dd,'Enter the test date.');
+    const have2=new Set(act(D().labs).map(l=>l.test+'|'+l.date+'|'+l.value));const batch=uid();let n=0,skipped=0;
+    const rows=[];
+    for(let i=0;i<r.rows.length;i++){if(!dd.querySelector('#rc'+i).checked)continue;const v=N(val(dd,'rv'+i));if(v==null)return dErr(dd,'Check the value for '+TESTS[r.rows[i].test].name+'.');
+      if(have2.has(r.rows[i].test+'|'+dt+'|'+v)){skipped++;continue}rows.push({...r.rows[i],value:v})}
+    if(!rows.length)return dErr(dd,skipped?'Those results are already saved.':'Nothing selected.');
+    const keep=dd.querySelector('#rkeep').checked;let noteId=null;
+    mutate(x=>{rows.forEach(w=>{addRec(x,'labs',{test:w.test,value:w.value,unit:w.unit,date:dt,range:w.range,source:'paste',batch});n++});
+      if(keep)noteId=addRec(x,'notes',{tag:'Lab text',text:text,date:dt,status:'',batch}).id;
+      x.imports.push(stamp({id:batch,date:dt,at:nowISO(),count:n,noteId}))});
+    $('#paste')&&($('#paste').value='');
+    toast('Saved '+n+' result'+(n===1?'':'s')+(skipped?' ('+skipped+' already saved)':''),()=>removeImport(batch,true));
+  }});
+}
+function removeImport(id,withNote){
+  mutate(x=>{const i=x.imports.find(r=>r.id===id);if(!i)return;act(x.labs).filter(l=>l.batch===id).forEach(l=>delRec(x,'labs',l.id));if(withNote&&i.noteId)delRec(x,'notes',i.noteId);delRec(x,'imports',id)});
+}
+function labManual(k){
+  dlg('Add a result',`<div class="fld">Test<select id="mt">${options(testKeys().map(t=>[t,TESTS[t].name+' ('+TESTS[t].unit+')']),k||'ldl')}</select></div><div class="fld2"><div class="fld">Value<input class="inp" id="mv" inputmode="decimal"></div><div class="fld">Date<input class="inp" type="date" id="md" value="${todayStr()}"></div></div><div class="fld">Lab's reference range (optional)<input class="inp" id="mr" placeholder="e.g. 0-99 or &lt;200"></div>`,{ok:'Add',onOk:(dd)=>{const v=N(val(dd,'mv'));if(v==null)return dErr(dd,'Enter the value.');const dt=val(dd,'md');if(!dt)return dErr(dd,'Enter the date.');const rg=val(dd,'mr').trim();
+    mutate(x=>addRec(x,'labs',{test:val(dd,'mt'),value:v,unit:TESTS[val(dd,'mt')].unit,date:dt,range:rg?normRange(rg):'',source:'manual'}));toast('Result added')}});
+}
+function labDetails(k){
+  const s=seriesFor(D(),k).slice().reverse(),T=TESTS[k];
+  const d=dlg(T.name+' — all results',`<div class="tbl"><table><tr><th>Date</th><th>Result</th><th></th></tr>${s.map(p=>`<tr><td>${fmtDate(p.t)}</td><td><b class="mono">${num(p.v,T.dec)}</b> ${T.unit}${p.edited?' <span class="mut" style="font-size:12px">(edited)</span>':''}${p.range?`<br><span class="mut" style="font-size:12px">lab range ${esc(p.range)}</span>`:''}</td><td style="white-space:nowrap"><button type="button" class="btn ghost sm" data-a="lab-edit" data-v="${p.id}">Edit</button> <button type="button" class="btn ghost sm" data-a="lab-del" data-v="${p.id}">Delete</button></td></tr>`).join('')}</table></div>`,{hideOk:true,cancel:'Close'});
+}
+function labEdit(id){
+  const l=D().labs.find(x=>x.id===id);if(!l)return;
+  $$('dialog').forEach(x=>x.close());
+  dlg('Edit result',`<div class="fld2"><div class="fld">Value<input class="inp" id="ev" inputmode="decimal" value="${l.value}"></div><div class="fld">Date<input class="inp" type="date" id="ed" value="${l.date}"></div></div><div class="fld">Lab's reference range<input class="inp" id="er" value="${esc(l.range||'')}"></div><p class="note">Edited results are marked, so you can tell a lab's number from one you changed.</p>`,{onOk:(dd)=>{const v=N(val(dd,'ev'));if(v==null)return dErr(dd,'Enter the value.');
+    mutate(x=>updRec(x,'labs',id,{value:v,date:val(dd,'ed'),range:normRange(val(dd,'er')),edited:true}));toast('Saved')}});
+}
+
+/* ---------- WHAT CHANGED ---------- */
+function visEvents(from,to){return act(D().events).filter(e=>A.tl.cats.includes(e.cat)&&e.date>=from&&e.date<=to).sort((a,b)=>a.date<b.date?-1:1)}
+VIEWS.changes=()=>{
+  const d=D(),ms=measuresWithData(d);
+  if(!A.tl.key||!ms.includes(A.tl.key))A.tl.key=ms[0]||null;
+  const key=A.tl.key,s=key?seriesFor(d,key):[];
+  const dates=[...s.map(p=>p.t),...act(d.events).map(e=>e.date)];
+  const {from,to}=windowFor(A.tl.range,dates);
+  const evs=visEvents(from,to);
+  const T=key&&TESTS[key];
+  const chart=key?chartHTML({pts:s,ref:T?T.ref:null,refLabel:T?T.refLabel:'',from,to,events:evs,h:230,label:measureName(d,key)+' with your changes pinned'}):'<div class="empty">Add lab results or body readings to see them here.</div>';
+  const all=act(d.events).sort((a,b)=>a.date<b.date?1:-1);
+  return `<div class="stack">${card('Pick what to look at',`${ms.length?`<div class="modes" role="group" aria-label="Measure">${ms.map(k=>`<button class="mode" data-a="tl-key" data-v="${k}" aria-pressed="${k===key}">${esc(measureName(d,k).replace('Blood pressure','Blood pressure (top)'))}</button>`).join('')}</div>`:''}
+  <div class="hbar" style="margin-bottom:8px">${rangeChips(A.tl.range,'tl-range')}<div class="chips" role="group" aria-label="Categories">${CATS.map(c=>`<button class="mode" style="min-height:34px;padding:4px 11px;font-size:12.5px" data-a="tl-cat" data-v="${c}" aria-pressed="${A.tl.cats.includes(c)}">${c}</button>`).join('')}</div></div>
+  ${chart}<p class="note">Numbered pins are your changes. Two things happening around the same time is an association, not proof that one caused the other.</p>`)}
+  ${card('Your changes',`${all.length?`<ul class="plain">${all.map(e=>{const idx=evs.indexOf(e);return `<li><span>${idx>=0?`<b>${idx+1}.</b> `:''}${esc(e.title)}<br><span class="mut" style="font-size:12.5px">${fmtDate(e.date)} · ${e.cat}</span></span><span class="row" style="margin:0;gap:6px;flex-wrap:nowrap">${key?`<button class="btn ghost sm" data-a="event-ba" data-v="${e.id}">Before / after</button>`:''}<button class="btn ghost sm" data-a="event-edit" data-v="${e.id}">Edit</button></span></li>`}).join('')}</ul>`:'<p class="mut">Nothing logged yet. Add a change when you start or stop something: a food, a training plan, a supplement, a new way of eating, or a life event like illness or travel.</p>'}<div class="row"><button class="btn" data-a="event-new">+ Add a change</button></div>`)}</div>`;
+};
+function eventDialog(id){
+  const e=id?D().events.find(x=>x.id===id):null;
+  const d=dlg(e?'Edit change':'Add a change',`<div class="fld">What changed<input class="inp" id="evt" value="${esc(e?e.title:'')}" placeholder="e.g. Started incline treadmill 3×/week" maxlength="120"></div><div class="fld2"><div class="fld">Date<input class="inp" type="date" id="evd" value="${e?e.date:todayStr()}"></div><div class="fld">Category<select id="evc">${options(CATS.map(c=>[c,c]),e?e.cat:'Food')}</select></div></div>${e?'<div class="row" style="margin-top:0"><button type="button" class="btn ghost sm" data-a="event-del" data-v="'+e.id+'">Delete this change</button></div>':''}`,{onOk:(dd)=>{const t=val(dd,'evt').trim();if(!t)return dErr(dd,'Describe what changed.');const dt=val(dd,'evd');if(!dt)return dErr(dd,'Pick a date.');
+    mutate(x=>{if(e)updRec(x,'events',e.id,{title:t,date:dt,cat:val(dd,'evc')});else addRec(x,'events',{title:t,date:dt,cat:val(dd,'evc')})});toast(e?'Saved':'Change added')}});
+}
+function beforeAfterDialog(id){
+  const e=D().events.find(x=>x.id===id),key=A.tl.key;if(!e||!key)return;
+  const r=beforeAfter(D(),key,e.date),dec=measureDec(D(),key),u=measureUnit(D(),key);
+  let body;
+  if(r.kind==='lab'){body=r.before&&r.after?`<table><tr><th></th><th>Date</th><th>Result</th></tr><tr><td>Before</td><td>${fmtDate(r.before.t)}</td><td class="mono">${num(r.before.v,dec)} ${u}</td></tr><tr><td>After</td><td>${fmtDate(r.after.t)}</td><td class="mono">${num(r.after.v,dec)} ${u}</td></tr></table><p class="mono" style="margin-top:10px">${r.after.v-r.before.v>0?'Up ':'Down '}${num(Math.abs(r.after.v-r.before.v),dec)} ${u}</p>`:`<p>${r.note}</p>`}
+  else body=r.before&&r.after?`<table><tr><th></th><th>Average</th><th>Readings</th></tr><tr><td>30 days before</td><td class="mono">${num(r.before.v,dec)} ${u}</td><td>${r.before.n}</td></tr><tr><td>30 days after</td><td class="mono">${num(r.after.v,dec)} ${u}</td><td>${r.after.n}</td></tr></table><p class="mono" style="margin-top:10px">${r.after.v-r.before.v>0?'Up ':'Down '}${num(Math.abs(r.after.v-r.before.v),dec)} ${u}</p>`:`<p>${r.note}</p>`;
+  dlg(esc(e.title)+' — '+esc(measureName(D(),key)),body+`<p class="note">${r.note||''} This shows what changed around that date, not why. Other things may have changed too.</p>`,{hideOk:true,cancel:'Close'});
+}
+
+/* ---------- TRACK ---------- */
+function metricCard(m){
+  const s=seriesFor(D(),m.id),l=s[s.length-1];
+  const st=l?metricStatus(m,{value:l.v,value2:l.v2}):null;
+  let trend='';if(s.length>1){const p=s[s.length-2],dl=l.v-p.v;trend=dl===0?'Same as last reading':(dl>0?'Up ':'Down ')+num(Math.abs(dl),m.dec)+' since last reading'}
+  return `<section class="card"><h3>${esc(m.name)}</h3>${l?`<div class="bl" style="align-items:center"><b class="big" style="font-size:28px">${m.pair&&l.v2!=null?l.v+'/'+l.v2:num(l.v,m.dec)}</b><span class="mut">${esc(m.unit)}</span></div><p class="mut" style="font-size:12.5px;margin:4px 0">${fmtDate(l.t)} · ${daysAgoText(l.t)}${trend?'<br>'+trend:''}</p>${st?chip(st[0],st[1]):''}`:`<p class="mut">No readings yet.</p>`}<div class="row"><button class="btn sm" data-a="reading-new" data-v="${m.id}">+ Add</button>${l?`<button class="btn ghost sm" data-a="metric-open" data-v="${m.id}">History</button>`:''}${m.builtin?'':`<button class="btn ghost sm" data-a="metric-edit" data-v="${m.id}">Edit</button>`}</div></section>`;
+}
+
+const todayEat=()=>act(D().days).find(x=>x.date===todayStr());
+function foodCards(){
+  const d=D(),fs=act(d.foods),es=eatingSummary(d,14);
+  const days=act(d.days).sort((a,b)=>a.date<b.date?1:-1).slice(0,7);
+  const eat=card('How I ate',`<p class="mut" style="font-size:14px;margin-bottom:10px">No foods or portions. Just the shape of the day: carb-heavy breakfast, big balanced dinner, late-night snacking.</p><div class="row" style="margin:0 0 10px"><button class="btn" data-a="eat-log" data-v="${todayStr()}">${todayEat()?'Edit today':'Log today'}</button><button class="btn ghost" data-a="eat-log" data-v="${addDays(todayStr(),-1)}">Yesterday</button></div>${days.length?`<ul class="plain">${days.map(x=>{const p=SLOTS.map(([k,l])=>slotText(x.slots&&x.slots[k])?`<b>${l.split(' ')[0]}</b> ${esc(slotText(x.slots[k]))}`:'').filter(Boolean);return `<li><span><span class="mut" style="font-size:12.5px">${fmtDate(x.date,false)}</span><br><span style="font-size:14px">${p.join(' · ')||'<span class="mut">no meals marked</span>'}</span>${x.note?`<br><span class="mut" style="font-size:13px">${esc(x.note)}</span>`:''}</span><button class="btn ghost sm" data-a="eat-log" data-v="${x.date}">Edit</button></li>`}).join('')}</ul>`:''}${es.lines.length?`<p class="note" style="margin-top:12px"><b>Last 14 days:</b> ${es.lines.map(esc).join(' · ')}.</p>`:''}`);
+  const grp=(k,l)=>{const g=fs.filter(f=>f.status===k);return g.length?`<p class="mut" style="font-size:13px;margin:12px 0 6px">${l}</p><div class="chips">${g.map(f=>`<button class="chip ${k==='good'?'good':k==='limit'?'warn':'mut'}" style="border:0;cursor:pointer;min-height:34px" data-a="food-edit" data-v="${f.id}">${esc(f.name)}</button>`).join('')}</div>`:''};
+  const foods=card('My food list',`<p class="mut" style="font-size:14px;margin-bottom:10px">Foods you believe are good, unsure about, or want to limit. It goes into “Ask AI” so it can check your list against your labs and goals.</p><div class="row" style="margin:0"><button class="btn" data-a="food-add">+ Add foods</button>${fs.length?'<button class="btn ghost" data-a="food-compare">Compare with AI</button>':''}</div>${grp('good','Good for me')}${grp('sometimes','Sometimes / unsure')}${grp('limit','Limit')}${fs.length?'':'<div class="empty" style="margin-top:10px">Nothing yet. Paste a comma-separated list to start.</div>'}`);
+  return `<div class="g2">${eat}${foods}</div>`;
+}
+function eatDialog(date){
+  const ex=act(D().days).find(x=>x.date===date),S=(ex&&ex.slots)||{};
+  const body=`<div class="fld">Day<input class="inp" type="date" id="ed" value="${date}"></div>${SLOTS.map(([k,l])=>{const s=S[k]||{};return `<fieldset style="border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0"><legend style="padding:0 6px;font-weight:600">${l}</legend><div class="chips" style="margin-bottom:8px">${MEAL_TAGS.map(t=>`<label class="chip mut" style="cursor:pointer;min-height:32px"><input type="checkbox" data-slot="${k}" value="${esc(t)}" ${(s.tags||[]).includes(t)?'checked':''}> ${esc(t)}</label>`).join('')}</div><label class="mut" style="font-size:13px">Size <select data-size="${k}" style="width:auto;min-height:36px;padding:4px 8px">${options([['','Not set'],['small','Small'],['normal','Normal'],['big','Big']],s.size||'')}</select></label></fieldset>`}).join('')}<div class="fld">Anything else<textarea id="en" rows="2" placeholder="e.g. overate at night, stressed, ate out">${esc((ex&&ex.note)||'')}</textarea></div>`;
+  dlg('How I ate',body,{ok:'Save',onOk:(dd)=>{const date2=val(dd,'ed')||date;const slots={};for(const [k] of SLOTS){const tags=[...dd.querySelectorAll(`input[data-slot="${k}"]:checked`)].map(x=>x.value);const size=dd.querySelector(`select[data-size="${k}"]`).value;if(tags.length||size)slots[k]={tags,size}}
+    const note=val(dd,'en').trim();const cur=act(D().days).find(x=>x.date===date2);
+    if(!Object.keys(slots).length&&!note){return dErr(dd,'Mark at least one meal or add a note.')}
+    mutate(x=>{if(cur)updRec(x,'days',cur.id,{slots,note});else addRec(x,'days',{date:date2,slots,note})})}});
+}
+function foodDialog(id){
+  const f=id?D().foods.find(x=>x.id===id):null;
+  dlg(f?'Edit food':'Add foods',`${f?`<div class="fld">Food<input class="inp" id="fn" value="${esc(f.name)}"></div>`:`<div class="fld">Foods (separate with commas or new lines)<textarea id="fn" rows="3" placeholder="oats, salmon, lentils, almonds, berries"></textarea></div>`}<div class="fld">How do you see it<select id="fs">${options(FOOD_STATUS,f?f.status:'good')}</select></div><div class="fld">Note (optional)<input class="inp" id="fo" value="${f?esc(f.note||''):''}" placeholder="e.g. only the plain kind"></div>`,
+  {ok:'Save',onOk:(dd)=>{const st=val(dd,'fs'),note=val(dd,'fo').trim();
+    if(f){const nm=val(dd,'fn').trim();if(!nm)return dErr(dd,'Enter a name.');mutate(x=>updRec(x,'foods',f.id,{name:nm,status:st,note}));return}
+    const names=parseFoodNames(val(dd,'fn'));if(!names.length)return dErr(dd,'Enter at least one food.');
+    const have=new Set(act(D().foods).map(x=>x.name.toLowerCase()));
+    mutate(x=>{for(const nm of names){if(have.has(nm.toLowerCase())){const e=x.foods.find(y=>!y.deleted&&y.name.toLowerCase()===nm.toLowerCase());updRec(x,'foods',e.id,{status:st,note:note||e.note})}else addRec(x,'foods',{name:nm,status:st,note})}});toast('Saved '+names.length+(names.length>1?' foods':' food'))}});
+  if(f){const d=document.querySelector('dialog form .dlgr');if(d){const b=document.createElement('button');b.type='button';b.className='btn ghost';b.textContent='Remove';b.onclick=()=>{mutate(x=>delRec(x,'foods',f.id));document.querySelector('dialog').close();document.querySelector('dialog').remove();toast('Removed',()=>mutate(x=>restoreRec(x,'foods',f.id)))};d.prepend(b)}}
+}
+VIEWS.track=()=>{
+  const d=D(),h=d.profile.heightIn,w=seriesFor(d,'weight'),wa=seriesFor(d,'waist');
+  let derived='';
+  if(h&&w.length){const bmi=703*w[w.length-1].v/(h*h);const cat=bmi<18.5?'Below range':bmi<25?'Inside range':bmi<30?'Above range':'Well above range';
+    derived+=`<section class="card"><h3>BMI (calculated)</h3><div class="bl" style="align-items:center"><b class="big" style="font-size:28px">${num(bmi,1)}</b><span class="mut">from ${Math.floor(h/12)}′${Math.round(h%12)}″ and weight</span></div><div style="margin-top:6px">${chip(cat,cat==='Inside range'?'good':'warn')}</div></section>`;
+    if(wa.length){const r=wa[wa.length-1].v/h;derived+=`<section class="card"><h3>Waist ÷ height</h3><div class="bl" style="align-items:center"><b class="big" style="font-size:28px">${num(r,2)}</b><span class="mut">general aim: under 0.5</span></div><div style="margin-top:6px">${chip(r<0.5?'Under 0.5':'Above 0.5',r<0.5?'good':'warn')}</div></section>`}
+  }
+  const fasts=act(d.fasts).filter(f=>f.end).sort((a,b)=>a.end<b.end?1:-1).slice(0,5);
+  return `<div class="stack"><div class="g3">${act(d.metricDefs).map(metricCard).join('')}${derived}</div>
+  ${!h?`<p class="note">Add your height in Settings to see BMI and waist ÷ height.</p>`:derived?`<p class="note">BMI is a rough screen and can read high if you carry muscle. Waist ÷ height and your trends tell more. General ranges only; your doctor's targets come first.</p>`:''}
+  <div class="row" style="margin:0"><button class="btn ghost" data-a="metric-new">+ Track something else</button></div>
+  <div class="g2">${card('Fasting',fastCard()+(fasts.length?`<ul class="plain" style="margin-top:14px">${fasts.map(f=>`<li><span>${fmtDate(f.start.slice(0,10),false)}</span><span class="mono mut">${fmtDur(Date.parse(f.end)-Date.parse(f.start))}</span></li>`).join('')}</ul>`:''))}${card('Check-in',HC.checkin.r())}</div>${foodCards()}</div>`;
+};
+function readingDialog(mid,rid){
+  const d0=D(),r=rid?d0.readings.find(x=>x.id===rid):null;
+  const defs=act(d0.metricDefs);let m=defs.find(x=>x.id===(r?r.metric:mid))||defs[0];
+  const form=(m)=>`<div class="fld2"><div class="fld">${m.pair?'Top number':'Value'} (${esc(m.unit)})<input class="inp" id="rv" inputmode="decimal" value="${r?r.value:''}"></div>${m.pair?`<div class="fld">Bottom number<input class="inp" id="rv2" inputmode="decimal" value="${r&&r.value2!=null?r.value2:''}"></div>`:''}</div>`;
+  const d=dlg(r?'Edit reading':'Add a reading',`${r?`<p><b>${esc(m.name)}</b></p>`:`<div class="fld">What<select id="rm">${options(defs.map(x=>[x.id,x.name]),m.id)}</select></div>`}<div id="rform">${form(m)}</div><div class="fld">Date<input class="inp" type="date" id="rd" value="${r?r.date:todayStr()}"></div>${r?'<div class="row" style="margin-top:0"><button type="button" class="btn ghost sm" data-a="reading-del" data-v="'+r.id+'">Delete this reading</button></div>':''}`,{onOk:(dd)=>{
+    const mm=defs.find(x=>x.id===(r?r.metric:val(dd,'rm')));const v=N(val(dd,'rv'));if(v==null)return dErr(dd,'Enter a value.');
+    let v2=null;if(mm.pair){v2=N(val(dd,'rv2'));if(v2==null)return dErr(dd,'Enter both numbers.')}
+    const dt=val(dd,'rd');if(!dt)return dErr(dd,'Pick a date.');
+    mutate(x=>{if(r)updRec(x,'readings',r.id,{value:v,value2:v2,date:dt});else addRec(x,'readings',{metric:mm.id,value:v,value2:v2,date:dt})});toast(r?'Saved':'Reading added')}});
+  d.addEventListener('change',e=>{if(e.target.id==='rm'){m=defs.find(x=>x.id===e.target.value);d.querySelector('#rform').innerHTML=form(m)}});
+}
+function metricOpen(id){
+  const m=act(D().metricDefs).find(x=>x.id===id),s=seriesFor(D(),id),{from,to}=windowFor('1y',s.map(p=>p.t));
+  dlg(esc(m.name),`${chartHTML({pts:s,from,to,h:180,label:m.name,ref:m.better==='band'&&m.hi!=null&&!m.pair?m.hi:null,refLabel:'upper range'})}<div class="tbl" style="margin-top:10px"><table><tr><th>Date</th><th>Value</th><th></th></tr>${s.slice().reverse().slice(0,40).map(p=>`<tr><td>${fmtDate(p.t)}</td><td class="mono">${m.pair&&p.v2!=null?p.v+'/'+p.v2:num(p.v,m.dec)} ${esc(m.unit)}</td><td><button type="button" class="btn ghost sm" data-a="reading-edit" data-v="${p.id}">Edit</button></td></tr>`).join('')}</table></div>`,{hideOk:true,cancel:'Close'});
+}
+function metricDialog(id){
+  const m=id?D().metricDefs.find(x=>x.id===id):null;
+  dlg(m?'Edit what you track':'Track something else',`<div class="fld">Name<input class="inp" id="mn" value="${esc(m?m.name:'')}" placeholder="e.g. Body fat" maxlength="40"></div><div class="fld2"><div class="fld">Unit<input class="inp" id="mu" value="${esc(m?m.unit:'')}" placeholder="e.g. %" maxlength="12"></div><div class="fld">Better when<select id="mb">${options([['none','No preference'],['lower','Lower'],['higher','Higher'],['band','Inside a range']],m?m.better:'none')}</select></div></div><div class="fld2"><div class="fld">Range low (optional)<input class="inp" id="ml" inputmode="decimal" value="${m&&m.lo!=null?m.lo:''}"></div><div class="fld">Range high (optional)<input class="inp" id="mh" inputmode="decimal" value="${m&&m.hi!=null?m.hi:''}"></div></div><p class="note">Ranges are your own or your doctor's. Status only shows when you set a range.</p>${m?'<div class="row" style="margin-top:0"><button type="button" class="btn ghost sm" data-a="metric-del" data-v="'+m.id+'">Delete this measure</button></div>':''}`,{onOk:(dd)=>{const n=val(dd,'mn').trim(),u=val(dd,'mu').trim();if(!n)return dErr(dd,'Give it a name.');const lo=N(val(dd,'ml')),hi=N(val(dd,'mh'));
+    const o={name:n,unit:u,better:val(dd,'mb'),lo,hi,dec:1};mutate(x=>{if(m)updRec(x,'metricDefs',m.id,o);else addRec(x,'metricDefs',o)});toast('Saved')}});
+}
+
+/* ---------- NOTES ---------- */
+const NOTE_TAGS=['AI advice','Doctor','Lab text','Other'];
+VIEWS.notes=()=>{
+  const d=D(),f=A.noteFilter,ns=act(d.notes).filter(n=>f==='All'||n.tag===f).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:a.updatedAt<b.updatedAt?1:-1);
+  return `<div class="g2" style="grid-template-columns:1fr 1.3fr"><div class="stack">${card('Paste text to keep',`<div class="fld">Type<select id="notetag">${options(NOTE_TAGS.filter(t=>t!=='Lab text').map(t=>[t,t]),'AI advice')}</select></div><textarea id="notein" aria-label="Text to keep" placeholder="Paste AI advice, doctor instructions, anything worth keeping"></textarea><div class="row"><button class="btn" data-a="note-save">Save original</button><span class="mut" id="notemsg" style="font-size:13px" aria-live="polite"></span></div><p class="note">Originals are never edited. A cleaned or summarized version can be saved next to the original. Deleting is deliberate and goes to Recently deleted first.</p>`)}
+  ${card('Questions for your doctor',`${act(d.questions).length?`<ul class="plain">${act(d.questions).sort((a,b)=>a.updatedAt<b.updatedAt?1:-1).map(q=>`<li><label class="sw" style="margin:0"><input type="checkbox" data-c="q-done" data-v="${q.id}" ${q.done?'checked':''}> <span style="${q.done?'text-decoration:line-through;color:var(--mut)':''}">${esc(q.text)}</span></label><button class="btn ghost sm" data-a="q-del" data-v="${q.id}" aria-label="Delete question">✕</button></li>`).join('')}</ul>`:'<p class="mut">Nothing yet.</p>'}<div class="row"><input class="inp" id="qin" placeholder="Add a question" style="flex:1 1 180px" maxlength="200"><button class="btn ghost" data-a="q-add">Add</button></div>`)}</div>
+  ${card('Saved notes',`<div class="modes" role="group" aria-label="Filter">${['All',...NOTE_TAGS].map(t=>`<button class="mode" style="min-height:34px;padding:4px 12px;font-size:12.5px" data-a="note-filter" data-v="${t}" aria-pressed="${f===t}">${t}</button>`).join('')}</div>${ns.length?ns.map(n=>`<div class="pt"><div class="bl"><b>${esc(n.text.split('\n')[0].slice(0,60))}${n.text.length>60?'…':''}</b><span class="mut">${fmtDate(n.date)} · ${n.tag}</span></div><details style="margin-top:6px"><summary>Original text</summary><p class="mut" style="white-space:pre-wrap;font-size:13px;margin-top:6px">${esc(n.text)}</p></details><div class="row">${chip('Original · locked','ok')}${n.tag==='AI advice'?`<label class="mut" style="font-size:13px">Outcome <select data-c="note-status" data-v="${n.id}" style="width:auto;min-height:36px;padding:4px 8px;font-size:14px">${options(['Not tried','To try','Helped','Didn’t help','Was wrong'].map(x=>[x,x]),n.status||'Not tried')}</select></label>`:''}</div>${n.cleaned?`<details open><summary>Cleaned version (linked)</summary><p style="margin-top:6px;white-space:pre-wrap">${esc(n.cleaned)}</p></details>`:''}<div class="row"><button class="btn ghost sm" data-a="note-clean" data-v="${n.id}">${n.cleaned?'Edit':'Add'} cleaned version</button><button class="btn ghost sm" data-a="note-del" data-v="${n.id}">Delete</button></div></div>`).join(''):'<div class="empty" style="margin-top:8px">Nothing saved here yet.</div>'}`)}</div>`;
+};
+
+/* ---------- ASK AI ---------- */
+function aiText(){return exportAI(D(),{...A.askInc,mode:A.askMode})}
+VIEWS.ask=()=>{
+  const inc=A.askInc,L={profile:'Age range, sex, height',goals:'Goals',labs:'Labs',body:'Body & habits',events:'Changes (12 months)',advice:'Saved AI advice',doctor:"Doctor's guidance",foods:'My food list',eating:'How I ate (14 days)'};
+  return `<div class="g2" style="grid-template-columns:1fr 1.4fr">${card('Build a question',`<div class="modes" role="group" aria-label="Mode">${[['food','Is this food OK?'],['plan','Weekly plan'],['compare','Compare my food list'],['labs','Interpret labs'],['free','Ask anything']].map(([k,l])=>`<button class="mode" data-a="ask-mode" data-v="${k}" aria-pressed="${A.askMode===k}">${l}</button>`).join('')}</div><p class="mut" style="font-size:13px;margin-bottom:6px">Include:</p>${Object.keys(L).map(k=>`<label class="sw" style="margin:4px 0"><input type="checkbox" data-c="ask-inc" data-v="${k}" ${inc[k]?'checked':''}> ${L[k]}</label>`).join('')}<p class="note">No name or birth date is ever stored, so none can be exported. The preview shows exactly what gets copied.</p><div class="row"><button class="btn" data-a="ask-copy">Copy text</button><span class="mut" id="copied" style="font-size:13px" aria-live="polite"></span></div>`)}${card('Preview',`<pre class="out" id="askout">${esc(aiText())}</pre>`)}</div>`;
+};
+function refreshAsk(){const o=$('#askout');if(o)o.textContent=aiText()}
+
+/* ---------- MORE (phone) ---------- */
+VIEWS.more=()=>`<div class="stack">${[['changes','What changed','Your changes against labs and body trends'],['notes','Notes','Saved AI advice, doctor notes, questions'],['ask','Ask AI','Build a question with your data'],['settings','Settings','Security, backup, profile, install']].map(([id,t,s])=>`<button class="tile" data-a="go" data-v="${id}"><b style="font-size:17px">${t}</b><span class="mut">${s}</span></button>`).join('')}</div>`;
+
+/* ---------- SETTINGS ---------- */
+const AGE=['','18–29','30–39','40–49','50–59','60–69','70+'];
+function trashItems(){
+  const d=D(),out=[];
+  const desc={labs:r=>(TESTS[r.test]?TESTS[r.test].name:r.test)+' '+r.value+' · '+r.date,readings:r=>measureName(d,r.metric)+' '+r.value+(r.value2!=null?'/'+r.value2:'')+' · '+r.date,goals:r=>'Goal: '+r.title,foods:r=>'Food: '+r.name,days:r=>'Day log · '+r.date,events:r=>'Change: '+r.title,notes:r=>r.tag==='Lab text'?'Pasted lab text · '+r.date:'Note: '+(r.text||'').split('\n')[0].slice(0,40),questions:r=>'Question: '+r.text,metricDefs:r=>'Measure: '+r.name};
+  for(const c of Object.keys(desc))for(const r of d[c])if(r.deleted&&!r.purged)out.push({c,r,label:desc[c](r)});
+  return out.sort((a,b)=>a.r.deletedAt<b.r.deletedAt?1:-1);
+}
+VIEWS.settings=()=>{
+  const d=D(),s=d.settings,P=d.profile,tr=trashItems(),dev=A.mode==='device';
+  const hasPk=dev&&A.env&&A.env.slots.passkey;
+  const pkNote=A.passkeyOk?'':'Passkey unlock needs the hosted https version of this app and a device with Face ID, Touch ID, or similar.';
+  return `<div class="g2">
+  ${card('Security',dev?`<p class="mut" style="font-size:14px">Your data is encrypted with your passphrase and kept only in this browser.</p><div class="row" style="margin-top:0"><button class="btn ghost sm" data-a="pass-change">Change passphrase</button><button class="btn ghost sm" data-a="lock-now">Lock now</button></div><div class="fld" style="margin-top:14px">Auto-lock after being idle<select data-c="pref" data-k="lockMin">${options([[0,'Never'],[1,'1 minute'],[5,'5 minutes'],[15,'15 minutes']],s.lockMin)}</select></div><p><b>Passkey (Face ID / Touch ID)</b></p><p class="mut" style="font-size:13.5px">${hasPk?'Turned on. Your passphrase always still works.':'Optional. Unlocks with your face or fingerprint instead of typing. Your passphrase stays as the fallback.'} ${pkNote}</p><div class="row" style="margin-top:0">${hasPk?'<button class="btn ghost sm" data-a="pk-off">Turn off passkey</button>':`<button class="btn ghost sm" data-a="pk-on" ${A.passkeyOk?'':'disabled'}>Set up passkey</button>`}</div><p class="note">Tip: save your passphrase in your phone's password manager so Face ID can fill it. If you lose both the passphrase and the passkey, the data cannot be recovered, so keep a backup file.</p>`:`<p>This is a <b>session only</b> visit. Nothing is saved on this device.</p><div class="row"><button class="btn" data-a="to-device">Save on this device, encrypted</button></div>`)}
+  ${card('Backup & move to another device',`<p class="mut" style="font-size:14px">A backup is one encrypted file or one block of text. It opens on any device with its passphrase, so any way of sending it is safe.</p><div class="row" style="margin-top:0"><button class="btn" data-a="backup-open">Make a backup</button><button class="btn ghost" data-a="import-open">Import &amp; merge</button></div><p class="note">Last backup: ${s.lastBackup?fmtDate(s.lastBackup)+' ('+daysAgoText(s.lastBackup)+')':'never'}.<br>Ways to move it: AirDrop or the Share button on iPhone, iCloud Drive or Files, email to yourself, <b>Copy as text</b> then paste on another device (Universal Clipboard works between Apple devices), or your own QR or sound transfer app. Importing merges: newer edits win and nothing is overwritten blindly.</p>`)}
+  ${card('Profile',`<p class="mut" style="font-size:13.5px">No name or birth date is stored. All optional.</p><div class="fld2"><div class="fld">Height (ft)<input class="inp" id="pf" inputmode="numeric" value="${P.heightIn?Math.floor(P.heightIn/12):''}"></div><div class="fld">Height (in)<input class="inp" id="pi" inputmode="decimal" value="${P.heightIn?Math.round(P.heightIn%12*10)/10:''}"></div></div><div class="fld2"><div class="fld">Age range<select id="pa">${options(AGE.map(a=>[a,a||'—']),P.ageRange)}</select></div><div class="fld">Sex (optional)<select id="ps">${options([['','—'],['female','Female'],['male','Male']],P.sex)}</select></div></div><div class="row" style="margin-top:0"><button class="btn ghost sm" data-a="profile-save">Save profile</button></div>`)}
+  ${card('Reminders',`<div class="fld">Suggest a lab retest after<select data-c="pref" data-k="retestDays">${options([[60,'60 days'],[90,'90 days'],[120,'120 days'],[180,'180 days']],s.retestDays)}</select></div><div class="fld">Next doctor visit<input class="inp" type="date" data-c="pref" data-k="doctorVisit" value="${s.doctorVisit||''}"></div>`)}
+  ${card('Install on your iPhone',`<ol style="margin:0;padding-left:20px;line-height:1.6;font-size:14px"><li>Open this page in <b>Safari</b>.</li><li>Tap <b>Share</b>, then <b>Add to Home Screen</b>.</li><li>Open it from the new icon.</li></ol><p class="note">Installed this way, your phone treats it as its own app and is less likely to clear its data. Stored data kept by the browser: <span id="persist">checking…</span></p>`)}
+  ${card('Recently deleted',tr.length?`<ul class="plain">${tr.slice(0,A.showAllTrash?60:6).map(t=>`<li><span>${esc(t.label)}<br><span class="mut" style="font-size:12px">deleted ${daysAgoText(t.r.deletedAt.slice(0,10))} · removed for good after 30 days</span></span><span class="row" style="margin:0;gap:6px;flex-wrap:nowrap"><button class="btn ghost sm" data-a="trash-restore" data-v="${t.c}:${t.r.id}">Restore</button><button class="btn ghost sm" data-a="trash-purge" data-v="${t.c}:${t.r.id}">Delete forever</button></span></li>`).join('')}</ul><div class="row">${tr.length>6&&!A.showAllTrash?`<button class="btn ghost sm" data-a="trash-more">Show all (${tr.length})</button>`:''}<button class="btn ghost sm" data-a="trash-empty">Empty recently deleted</button></div>`:'<p class="mut">Nothing here.</p>')}
+  ${card('Wipe everything',`<div class="wipe"><p>Deletes every goal, lab result, note and setting stored on this device, then clears the app's caches. Backups you saved elsewhere are not touched.</p><button class="btn danger" data-a="wipe">Wipe everything…</button></div>`,'span2')}
+  </div><p class="note" style="margin-top:14px">Status labels use general reference ranges and are not medical advice. This app never makes network requests: your data is processed on this device only.</p>`;
+};
+
+/* ---------- backup / import ---------- */
+function download(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)}
+async function buildBackup(dd){
+  const p=dd.querySelector('#bkp').value;if(p.length<8){dErr(dd,'Use a passphrase of at least 8 characters for the backup.');return null}
+  if(dd.querySelector('#bkp2')&&dd.querySelector('#bkp2').value!==p){dErr(dd,'The two passphrases do not match.');return null}
+  return makeBackup(D(),p);
+}
+function markBackup(){mutate(x=>{x.settings.lastBackup=todayStr();stamp(x.settings)},{render:false});if(A.tab==='settings'||A.tab==='home')draw()}
+function backupDialog(){
+  const canShare=!!(navigator.canShare&&navigator.canShare({files:[new File(['x'],'x.json',{type:'application/json'})]}));
+  dlg('Make a backup',`<p class="mut" style="font-size:14px">Choose a passphrase for this backup. It can be the same as your vault passphrase or a different one. You will need it to open the backup.</p><input type="text" autocomplete="username" value="health-log-backup" style="position:absolute;left:-9999px" tabindex="-1" aria-hidden="true"><div class="fld">Backup passphrase<input class="inp" type="password" id="bkp" autocomplete="new-password"></div><div class="fld">Type it again<input class="inp" type="password" id="bkp2" autocomplete="new-password"></div><div class="row"><button type="button" class="btn" data-a="bk-file">Save file</button>${canShare?'<button type="button" class="btn ghost" data-a="bk-share">Share / AirDrop</button>':''}<button type="button" class="btn ghost" data-a="bk-text">Copy as text</button></div>`,{hideOk:true,cancel:'Close'});
+}
+function importDialog(){
+  let pending=null;
+  const d=dlg('Import & merge',`<p class="mut" style="font-size:14px">Choose a backup file, or paste backup text. Your current data is kept; newer edits win, and nothing is removed unless it was deleted on the other device.</p><div class="fld">Backup file<input class="inp" type="file" id="ifile" accept=".json,.txt,.healthlog,application/json,text/plain"></div><div class="fld">…or paste backup text<textarea id="itext" style="min-height:80px" placeholder="HL1:…"></textarea></div><div class="fld">Backup passphrase<input class="inp" type="password" id="ipass" autocomplete="current-password"></div><div id="isum"></div>`,{ok:'Check backup',onOk:async(dd)=>{
+    if(pending){mutate(x=>{Object.assign(x,mergeData(x,pending.inc).data)});toast('Merged: '+pending.stats.added+' added, '+pending.stats.updated+' updated');return true}
+    let raw=val(dd,'itext').trim();const f=dd.querySelector('#ifile').files[0];
+    if(!raw&&f)raw=await f.text();if(!raw)return dErr(dd,'Choose a file or paste the backup text.');
+    const pass=val(dd,'ipass');if(!pass)return dErr(dd,'Enter the backup passphrase.');
+    let obj;try{obj=backupFromText(raw)}catch(e){return dErr(dd,e.message)}
+    let inc;try{inc=await readBackup(obj,pass)}catch(e){return dErr(dd,e.message)}
+    const m=mergeData(D(),inc);pending={inc,stats:m.stats};
+    dd.querySelector('#isum').innerHTML=`<div class="pt"><b>Ready to merge</b><br>${m.stats.added} new · ${m.stats.updated} updated · ${m.stats.removed} deleted on the other device · ${m.stats.same} unchanged</div>`;
+    dd.querySelector('[type=submit]').textContent='Merge into my data';dd.querySelector('.err').textContent='';return false;
+  }});
+}
+
+/* ---------- boot, welcome, unlock, lock ---------- */
+function screen(html){root.innerHTML=`<div class="screen"><div class="panel">${html}</div></div>`}
+const userField='<input type="text" autocomplete="username" value="Health Log" readonly style="position:absolute;left:-9999px;width:1px;height:1px" tabindex="-1" aria-hidden="true">';
+function showWelcome(dbErr){
+  screen(`<h1>Health Log</h1><p class="mut">Track labs, goals and habits, and build questions for an AI, all on your own device. No account. Nothing is sent anywhere.</p>
+  <div class="choice rec"><b>Save on this device, encrypted</b> <span class="chip good">Recommended</span><p class="mut" style="font-size:14px;margin:6px 0 10px">Your data is locked with a passphrase. Pick something you can remember and save it in your password manager.</p>${dbErr?`<p class="err">${esc(dbErr)}</p>`:`<form id="setup" autocomplete="on">${userField}<div class="fld">Passphrase<input class="inp" type="password" id="sp1" autocomplete="new-password"></div><div class="fld">Type it again<input class="inp" type="password" id="sp2" autocomplete="new-password"></div><label class="sw"><input type="checkbox" id="sack"> I understand a lost passphrase cannot be recovered</label><div class="err" id="sperr"></div><button class="btn" type="submit" style="width:100%">Create encrypted vault</button></form>`}</div>
+  <div class="choice"><b>Session only</b><p class="mut" style="font-size:14px;margin:6px 0 10px">Nothing is saved. Good for a shared computer. Everything is gone when you close the page unless you export a backup.</p><button class="btn ghost" data-a="start-session" style="width:100%">Start a session</button></div>`);
+  const f=$('#setup');if(f)f.addEventListener('submit',async e=>{
+    e.preventDefault();const p=$('#sp1').value,er=$('#sperr');
+    const h=strengthHint(p);if(!h.ok){er.textContent=h.msg;return}
+    if(p!==$('#sp2').value){er.textContent='The two passphrases do not match.';return}
+    if(!$('#sack').checked){er.textContent='Please tick the box to continue.';return}
+    f.querySelector('button').disabled=true;er.textContent='Creating…';
+    try{const data=emptyData();const v=await createVault(p,data);A.env=v.env;A.mk=v.mk;A.master=v.master;A.data=data;A.mode='device';await dbPut('vault',A.env);if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});startApp()}
+    catch(err){er.textContent='Could not create the vault: '+(err.message||err);f.querySelector('button').disabled=false}
+  });
+}
+function showUnlock(msg){
+  const pk=A.env&&A.env.slots&&A.env.slots.passkey&&A.passkeyOk;
+  screen(`<h1>Unlock</h1><p class="mut">Enter your passphrase to open Health Log.</p><form id="unlock" autocomplete="on">${userField}<div class="fld"><input class="inp" type="password" id="up" autocomplete="current-password" aria-label="Passphrase"></div><div class="err" id="uerr">${esc(msg||'')}</div><button class="btn" type="submit" style="width:100%">Unlock</button></form>${pk?'<div class="row"><button class="btn ghost" data-a="pk-unlock" style="width:100%">Unlock with passkey</button></div>':''}<details style="margin-top:18px"><summary class="mut" style="cursor:pointer">Trouble unlocking?</summary><p class="mut" style="font-size:13.5px;margin-top:8px">The passphrase cannot be recovered. If you have a backup file, you can erase this vault, start fresh, and import the backup.</p><button class="btn ghost sm" data-a="wipe">Erase this vault…</button></details>`);
+  const f=$('#unlock');f.addEventListener('submit',async e=>{
+    e.preventDefault();const b=f.querySelector('button');b.disabled=true;$('#uerr').textContent='Unlocking…';
+    try{const u=await unlockWithPass(A.env,$('#up').value);finishUnlock(u)}
+    catch(err){$('#uerr').textContent=err.message==='Wrong passphrase'?'That passphrase did not work.':'Could not unlock: '+(err.message||err);b.disabled=false}
+  });
+  setTimeout(()=>{const i=$('#up');if(i)i.focus()},50);
+}
+function finishUnlock(u){A.mk=u.mk;A.master=u.master;A.data=ensureColl(u.data);A.mode='device';
+  const base=emptyData();for(const k of Object.keys(base))if(A.data[k]==null)A.data[k]=base[k];
+  if(autoPurge(A.data))scheduleSave();startApp()}
+function startApp(){A.locked=false;A.tab='home';A.animate=true;draw();armIdle()}
+async function lockNow(){
+  if(A.mode!=='device')return;
+  await saveNow();$$('dialog').forEach(d=>d.close());const t=$('.toast');if(t)t.remove();
+  A.data=null;A.mk=null;A.master=null;A.locked=true;showUnlock();
+}
+function armIdle(){clearTimeout(A.idleTimer);if(A.mode!=='device'||!A.data)return;const m=A.data.settings.lockMin;if(m>0)A.idleTimer=setTimeout(lockNow,m*60000)}
+['pointerdown','keydown','touchstart'].forEach(e=>addEventListener(e,()=>{if(!A.locked)armIdle()},{passive:true}));
+document.addEventListener('visibilitychange',()=>{
+  if(A.locked||A.mode!=='device'||!A.data)return;
+  if(document.hidden){A.hiddenAt=Date.now()}
+  else{const m=A.data.settings.lockMin;if(m>0&&A.hiddenAt&&Date.now()-A.hiddenAt>m*60000)lockNow();A.hiddenAt=0}
+});
+
+/* ---------- passkey (optional; the passphrase always works) ---------- */
+async function passkeyAvailable(){
+  try{if(!window.PublicKeyCredential||!navigator.credentials)return false;
+    if(!(location.protocol==='https:'||location.hostname==='localhost'))return false;
+    if(PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable)return !!(await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable());
+    return false}catch(e){return false}
+}
+async function passkeyEval(id){
+  const a=await navigator.credentials.get({publicKey:{challenge:rnd(32),rpId:location.hostname,allowCredentials:id?[{type:'public-key',id}]:[],userVerification:'required',extensions:{prf:{eval:{first:PRF_SALT}}},timeout:60000}});
+  const r=a.getClientExtensionResults().prf;
+  if(!r||!r.results||!r.results.first)throw new Error('Your device did not return a key for this passkey. Use your passphrase.');
+  return new Uint8Array(r.results.first);
+}
+async function passkeyRegister(){
+  const cred=await navigator.credentials.create({publicKey:{rp:{name:'Health Log',id:location.hostname},user:{id:rnd(16),name:'health-log',displayName:'Health Log'},challenge:rnd(32),pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{residentKey:'preferred',userVerification:'required',authenticatorAttachment:'platform'},extensions:{prf:{}},timeout:60000}});
+  const ext=cred.getClientExtensionResults();
+  if(!ext.prf||!ext.prf.enabled)throw new Error('This device or browser does not support passkey unlock yet. Your passphrase still works.');
+  const id=new Uint8Array(cred.rawId);
+  return {id,out:await passkeyEval(id)};
+}
+
+/* ---------- wipe ---------- */
+function wipeFlow(){
+  dlg('Wipe everything',`<p>This deletes all data stored on this device and cannot be undone. Backups you saved elsewhere are not touched.</p><div class="fld">Type <code>WIPE</code> to continue<input class="inp" id="wtype" autocomplete="off" autocapitalize="characters"></div>`,{ok:'Continue',danger:true,onOk:(dd)=>{
+    if(val(dd,'wtype').trim()!=='WIPE')return dErr(dd,'Type WIPE exactly.');
+    setTimeout(wipeHold,50);
+  }});
+}
+function wipeHold(){
+  const d=dlg('Last step',`<p>Press and hold the button for 2 seconds.</p><div class="row"><button type="button" class="btn danger hold" id="hb"><i></i><span>Hold to wipe</span></button></div>`,{hideOk:true,noFocus:true});
+  const b=d.querySelector('#hb'),bar=b.querySelector('i');let t0=0,raf=0;
+  const stop=()=>{t0=0;cancelAnimationFrame(raf);bar.style.width='0'};
+  const loop=()=>{const p=Math.min(1,(performance.now()-t0)/2000);bar.style.width=p*100+'%';if(p>=1){doWipe()}else raf=requestAnimationFrame(loop)};
+  const start=()=>{if(!t0){t0=performance.now();raf=requestAnimationFrame(loop)}};
+  b.addEventListener('pointerdown',start);['pointerup','pointerleave','pointercancel','blur'].forEach(e=>b.addEventListener(e,stop));
+  b.addEventListener('keydown',e=>{if((e.key===' '||e.key==='Enter')&&!e.repeat){e.preventDefault();start()}});b.addEventListener('keyup',stop);
+}
+async function doWipe(){
+  clearTimeout(A.saveTimer);A.data=null;A.mk=null;A.master=null;
+  try{if(_db)_db.close()}catch(e){}
+  await new Promise(r=>{try{const q=indexedDB.deleteDatabase(DBNAME);q.onsuccess=q.onerror=q.onblocked=()=>r()}catch(e){r()}});
+  try{localStorage.clear();sessionStorage.clear()}catch(e){}
+  try{if(window.caches){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)))}}catch(e){}
+  try{if(navigator.serviceWorker){const rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(r=>r.unregister()))}}catch(e){}
+  location.replace(location.pathname);
+}
+
+/* ---------- actions ---------- */
+const ACT={
+  go:el=>go(el.dataset.v),
+  'eat-log':el=>eatDialog(el.dataset.v),
+  'food-add':()=>foodDialog(),
+  'food-edit':el=>foodDialog(el.dataset.v),
+  'food-compare':()=>{A.askMode='compare';A.tab='ask';draw()},
+  'toast-undo':()=>{const t=$('.toast');if(t&&t._undo){t._undo();t.remove()}},
+  'start-session':()=>{A.mode='session';A.data=emptyData();A.env=null;startApp()},
+  'to-device':()=>{
+    dlg('Save on this device',`<p class="mut" style="font-size:14px">Choose a passphrase. Your current session data will be encrypted and saved.</p>${userField}<div class="fld">Passphrase<input class="inp" type="password" id="np1" autocomplete="new-password"></div><div class="fld">Type it again<input class="inp" type="password" id="np2" autocomplete="new-password"></div>`,{ok:'Save encrypted',onOk:async(dd)=>{const p=val(dd,'np1');const h=strengthHint(p);if(!h.ok)return dErr(dd,h.msg);if(p!==val(dd,'np2'))return dErr(dd,'The two passphrases do not match.');
+      const v=await createVault(p,A.data);A.env=v.env;A.mk=v.mk;A.master=v.master;A.mode='device';await dbPut('vault',A.env);if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});armIdle();draw();toast('Saved and encrypted')}});
+  },
+  'home-page':el=>{const v=el.dataset.v;if(v==='cust')A.cust=true;else if(v==='done')A.cust=false;else A.homePage=v;refreshHome()},
+  'home-where':el=>{const [id,w]=el.dataset.v.split(':');mutate(x=>{x.settings.home.where[id]=w;stamp(x.settings)},{render:false});refreshHome()},
+  'home-move':el=>{const [id,dl]=el.dataset.v.split(':');mutate(x=>{const o=x.settings.home.order,i=o.indexOf(id),j=i+ +dl;if(j>=0&&j<o.length){[o[i],o[j]]=[o[j],o[i]]}stamp(x.settings)},{render:false});refreshHome()},
+  'goal-new':()=>goalDialog(),
+  'goal-edit':el=>goalDialog(D().goals.find(g=>g.id===el.dataset.v)),
+  'goal-del':el=>{const id=el.dataset.v;mutate(x=>delRec(x,'goals',id));toast('Goal deleted',()=>mutate(x=>restoreRec(x,'goals',id)))},
+  'habit-log':el=>{const id=el.dataset.v,t=todayStr();const ex=act(D().habitLogs).find(h=>h.goal===id&&h.date===t);mutate(x=>{if(ex)delRec(x,'habitLogs',ex.id);else addRec(x,'habitLogs',{goal:id,date:t})})},
+  'lab-read':()=>labReview($('#paste').value),
+  'lab-add':()=>labManual(),
+  'lab-range':el=>{A.labRange=el.dataset.v;draw()},
+  'lab-details':el=>labDetails(el.dataset.v),
+  'lab-edit':el=>labEdit(el.dataset.v),
+  'lab-del':el=>{const id=el.dataset.v;$$('dialog').forEach(x=>x.close());mutate(x=>delRec(x,'labs',id));toast('Result deleted',()=>mutate(x=>restoreRec(x,'labs',id)))},
+  'import-remove':el=>{const id=el.dataset.v,i=D().imports.find(x=>x.id===id);
+    dlg('Remove this import',`<p>This removes the results from this import. They go to Recently deleted first.</p>${i&&i.noteId?'<label class="sw"><input type="checkbox" id="rmnote" checked> Also remove the original pasted text</label>':''}`,{ok:'Remove import',danger:true,onOk:(dd)=>{const w=dd.querySelector('#rmnote');removeImport(id,w?w.checked:false);toast('Import removed')}})},
+  'tl-key':el=>{A.tl.key=el.dataset.v;draw()},
+  'tl-range':el=>{A.tl.range=el.dataset.v;draw()},
+  'tl-cat':el=>{const c=el.dataset.v,i=A.tl.cats.indexOf(c);if(i>=0)A.tl.cats.splice(i,1);else A.tl.cats.push(c);draw()},
+  'event-new':()=>eventDialog(),
+  'event-edit':el=>eventDialog(el.dataset.v),
+  'event-del':el=>{const id=el.dataset.v;$$('dialog').forEach(x=>x.close());mutate(x=>delRec(x,'events',id));toast('Change deleted',()=>mutate(x=>restoreRec(x,'events',id)))},
+  'event-ba':el=>beforeAfterDialog(el.dataset.v),
+  'reading-new':el=>readingDialog(el.dataset.v),
+  'reading-edit':el=>{$$('dialog').forEach(x=>x.close());readingDialog(null,el.dataset.v)},
+  'reading-del':el=>{const id=el.dataset.v;$$('dialog').forEach(x=>x.close());mutate(x=>delRec(x,'readings',id));toast('Reading deleted',()=>mutate(x=>restoreRec(x,'readings',id)))},
+  'metric-open':el=>metricOpen(el.dataset.v),
+  'metric-new':()=>metricDialog(),
+  'metric-edit':el=>metricDialog(el.dataset.v),
+  'metric-del':el=>{const id=el.dataset.v;$$('dialog').forEach(x=>x.close());mutate(x=>delRec(x,'metricDefs',id));toast('Measure deleted',()=>mutate(x=>restoreRec(x,'metricDefs',id)))},
+  'fast-start':()=>mutate(x=>addRec(x,'fasts',{start:nowISO(),end:null})),
+  'fast-end':()=>{const f=activeFast();if(f)mutate(x=>updRec(x,'fasts',f.id,{end:nowISO()}))},
+  'fast-goal':()=>dlg('Fasting goal',`<div class="fld">Hours<input class="inp" id="fg" inputmode="numeric" value="${D().settings.fastGoal||16}"></div>`,{onOk:(dd)=>{const n=Math.round(N(val(dd,'fg'))||0);if(n<1||n>72)return dErr(dd,'Enter 1 to 72 hours.');mutate(x=>{x.settings.fastGoal=n;stamp(x.settings)})}}),
+  'checkin-save':()=>{const g=k=>{const e=document.querySelector(`input[name="ck-${k}"]:checked`);return e?+e.value:null};const o={energy:g('energy'),hunger:g('hunger'),sleepq:g('sleepq')};if(o.energy==null&&o.hunger==null&&o.sleepq==null){$('#ckmsg').textContent='Pick at least one';return}
+    const ex=act(D().checkins).find(c=>c.date===todayStr());mutate(x=>{if(ex)updRec(x,'checkins',ex.id,o);else addRec(x,'checkins',{date:todayStr(),...o})},{render:false});$('#ckmsg').textContent='Saved ✓'},
+  'set-visit':()=>dlg('Next doctor visit',`<div class="fld">Date<input class="inp" type="date" id="dv"></div>`,{onOk:(dd)=>{const v=val(dd,'dv');if(!v)return dErr(dd,'Pick a date.');mutate(x=>{x.settings.doctorVisit=v;stamp(x.settings)})}}),
+  'note-save':()=>{const t=$('#notein').value.trim();if(!t){$('#notemsg').textContent='Paste something first';return}mutate(x=>addRec(x,'notes',{tag:$('#notetag').value,date:todayStr(),status:'Not tried',text:t,cleaned:''}));toast('Saved. The original is locked.')},
+  'note-filter':el=>{A.noteFilter=el.dataset.v;draw()},
+  'note-clean':el=>{const n=D().notes.find(x=>x.id===el.dataset.v);dlg('Cleaned version',`<p class="mut" style="font-size:14px">Paste a cleaned-up or summarized version. The original stays locked and linked.</p><textarea id="nc" style="min-height:140px">${esc(n.cleaned||'')}</textarea>`,{onOk:(dd)=>{mutate(x=>updRec(x,'notes',n.id,{cleaned:val(dd,'nc').trim(),cleanedAt:nowISO()}))}})},
+  'note-del':el=>{const id=el.dataset.v;dlg('Delete this note?',`<p>It moves to Recently deleted, where you can restore it for 30 days or delete it for good.</p>`,{ok:'Delete',danger:true,onOk:()=>{mutate(x=>delRec(x,'notes',id));toast('Note deleted',()=>mutate(x=>restoreRec(x,'notes',id)))}})},
+  'q-add':()=>{const t=$('#qin').value.trim();if(!t)return;mutate(x=>addRec(x,'questions',{text:t,done:false}))},
+  'q-del':el=>{const id=el.dataset.v;mutate(x=>delRec(x,'questions',id))},
+  'ask-mode':el=>{A.askMode=el.dataset.v;draw()},
+  'ask-copy':async()=>{const s=$('#copied'),t=aiText();try{await navigator.clipboard.writeText(t);s.textContent='Copied'}catch(e){const o=$('#askout');const r=document.createRange();r.selectNodeContents(o);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);s.textContent='Selected — press copy'}},
+  'pass-change':()=>dlg('Change passphrase',`${userField}<div class="fld">Current passphrase<input class="inp" type="password" id="cp0" autocomplete="current-password"></div><div class="fld">New passphrase<input class="inp" type="password" id="cp1" autocomplete="new-password"></div><div class="fld">Type it again<input class="inp" type="password" id="cp2" autocomplete="new-password"></div>`,{onOk:async(dd)=>{try{await unlockWithPass(A.env,val(dd,'cp0'))}catch(e){return dErr(dd,'The current passphrase did not work.')}const p=val(dd,'cp1'),h=strengthHint(p);if(!h.ok)return dErr(dd,h.msg);if(p!==val(dd,'cp2'))return dErr(dd,'The two new passphrases do not match.');
+    await changePassphrase(A.env,A.master,p);await saveNow();toast('Passphrase changed')}}),
+  'lock-now':()=>lockNow(),
+  'pk-on':async()=>{try{const r=await passkeyRegister();await addPasskeySlot(A.env,A.master,r.id,r.out);await dbPut('vault',A.env);draw();toast('Passkey unlock is on')}catch(e){toast(e&&e.name==='NotAllowedError'?'Passkey setup was cancelled':(e.message||'Passkey setup failed'))}},
+  'pk-off':async()=>{delete A.env.slots.passkey;await dbPut('vault',A.env);draw();toast('Passkey unlock is off')},
+  'pk-unlock':async()=>{try{const slot=A.env.slots.passkey;const out=await passkeyEval(unb64(slot.credId));finishUnlock(await unlockWithPrf(A.env,out))}catch(e){const m=$('#uerr');if(m)m.textContent=e&&e.name==='NotAllowedError'?'Passkey was cancelled. You can use your passphrase.':(e.message||'Passkey did not work. Use your passphrase.')}},
+  'backup-open':()=>backupDialog(),
+  'bk-file':async el=>{const dd=el.closest('dialog');const b=await buildBackup(dd);if(!b)return;download('health-log-backup-'+todayStr()+'.json',new Blob([JSON.stringify(b)],{type:'application/json'}));markBackup();dd.close();toast('Backup file saved')},
+  'bk-share':async el=>{const dd=el.closest('dialog');const b=await buildBackup(dd);if(!b)return;try{await navigator.share({files:[new File([JSON.stringify(b)],'health-log-backup-'+todayStr()+'.json',{type:'application/json'})],title:'Health Log backup'});markBackup();dd.close()}catch(e){if(e&&e.name!=='AbortError')dErr(dd,'Sharing did not work here. Use Save file instead.')}},
+  'bk-text':async el=>{const dd=el.closest('dialog');const b=await buildBackup(dd);if(!b)return;const t=backupToText(b);try{await navigator.clipboard.writeText(t);markBackup();dd.close();toast('Backup text copied')}catch(e){dd.querySelector('.dlgb').insertAdjacentHTML('beforeend','<div class="fld" style="margin-top:12px">Copy this text<textarea readonly onfocus="this.select()" style="min-height:90px">'+esc(t)+'</textarea></div>');markBackup()}},
+  'import-open':()=>importDialog(),
+  'profile-save':()=>{const f=N($('#pf').value)||0,i=N($('#pi').value)||0,h=f*12+i;mutate(x=>{x.profile.heightIn=h>0?h:null;x.profile.ageRange=$('#pa').value;x.profile.sex=$('#ps').value;stamp(x.profile)},{render:false});toast('Profile saved')},
+  'trash-restore':el=>{const [c,id]=el.dataset.v.split(':');mutate(x=>restoreRec(x,c,id));toast('Restored')},
+  'trash-purge':el=>{const [c,id]=el.dataset.v.split(':');mutate(x=>purgeRec(x,c,id))},
+  'trash-more':()=>{A.showAllTrash=true;draw()},
+  'trash-empty':()=>dlg('Empty recently deleted?',`<p>These items will be deleted for good.</p>`,{ok:'Delete for good',danger:true,onOk:()=>mutate(x=>{for(const t of trashItems())purgeRec(x,t.c,t.r.id)})}),
+  wipe:()=>wipeFlow()
+};
+const CH={
+  peek:el=>mutate(x=>{x.settings.peek=el.checked;stamp(x.settings)},{render:false}),
+  pref:el=>{const k=el.dataset.k;let v=el.value;if(k==='lockMin'||k==='retestDays')v=+v;mutate(x=>{x.settings[k]=v;stamp(x.settings)},{render:false});if(k==='lockMin')armIdle();toast('Saved')},
+  'q-done':el=>mutate(x=>updRec(x,'questions',el.dataset.v,{done:el.checked})),
+  'note-status':el=>{mutate(x=>updRec(x,'notes',el.dataset.v,{status:el.value}),{render:false})},
+  'ask-inc':el=>{A.askInc[el.dataset.v]=el.checked;refreshAsk()}
+};
+document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el)return;const f=ACT[el.dataset.a];if(f){e.preventDefault();f(el,e)}});
+document.addEventListener('change',e=>{const el=e.target.closest('[data-c]');if(!el)return;const f=CH[el.dataset.c];if(f)f(el)});
+setInterval(()=>{if(!A.locked&&A.tab==='home'&&!A.cust&&activeFast()&&!$('dialog')){const b=$('#homebody');if(b&&A.homePage==='pin')refreshHome()}},60000);
+
+/* ---------- start ---------- */
+async function boot(){
+  A.passkeyOk=await passkeyAvailable();
+  if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+  try{await dbOpen()}catch(e){showWelcome(e.message);return}
+  let env=null;try{env=await dbGet('vault')}catch(e){}
+  if(env){A.env=env;showUnlock()}else showWelcome();
+}
+boot();
+
+</script>
+</body>
+</html>
