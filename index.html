@@ -168,6 +168,47 @@ label.chip.mut:has(input:checked){--c:var(--good);box-shadow:inset 0 0 0 1px var
 label.chip.mut:has(input:checked)::before{content:"✓";width:auto;margin-right:2px}
 label.chip.mut:has(input:focus-visible){outline:2px solid var(--accent,#3dd6c6);outline-offset:2px}
 
+/* lab paste workspace */
+.labws{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:16px;align-items:start}
+@media(max-width:900px){.labws{grid-template-columns:1fr}}
+.seg{display:inline-flex;background:#0f1318;border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.seg button{background:none;border:0;border-radius:8px;padding:6px 12px;min-height:34px;font-size:13.5px;color:var(--mut)}
+.seg button[aria-pressed=true]{background:var(--card);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+.seg button:disabled{opacity:.4}
+#labsrc textarea{min-height:380px;border-style:dashed;background:#0f1318;line-height:1.55}
+#labsrc textarea:focus{border-style:solid;border-color:var(--acc);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 22%,transparent)}
+pre.src{margin:0;min-height:380px;max-height:560px;overflow:auto;background:#0f1318;border:1px solid var(--line);border-radius:12px;padding:12px;font:13px/1.65 ui-monospace,Menlo,monospace;white-space:pre-wrap;word-break:break-word;color:var(--mut)}
+.src .hl,.src .hl2{display:block;margin:0 -6px;padding:0 6px;border-left:3px solid var(--acc);background:color-mix(in srgb,var(--acc) 12%,transparent);color:var(--ink);border-radius:0 6px 6px 0;cursor:pointer;transition:background .15s}
+.src .hl2{border-left-color:var(--ok);background:color-mix(in srgb,var(--ok) 11%,transparent);cursor:default}
+.src .hl.on,.src .hl2.on{background:color-mix(in srgb,var(--acc) 30%,transparent);box-shadow:0 0 0 1px var(--acc)}
+.src .hl2.on{background:color-mix(in srgb,var(--ok) 28%,transparent);box-shadow:0 0 0 1px var(--ok)}
+.legend{font-size:12.5px;color:var(--mut);margin:10px 0 0}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 5px 0 0;vertical-align:-1px}.legend .k1{background:var(--acc)}.legend .k2{background:var(--ok);margin-left:6px}
+.lab-empty{text-align:center;padding:34px 12px}.lab-empty b{font-size:16px}.lab-empty p{max-width:340px;margin:8px auto 14px;font-size:14px}.lab-ill{color:var(--mut);margin-bottom:10px}
+.datepill{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#0f1318;border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin:2px 0 12px;font-size:13.5px}
+.datepill input{background:none;border:0;font-weight:600;min-height:32px;color:var(--ink)}
+.lr{background:color-mix(in srgb,#fff 2.5%,var(--card));border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;animation:lrIn .35s both;animation-delay:calc(var(--i,0)*45ms)}
+.lr:focus-within{border-color:color-mix(in srgb,var(--acc) 60%,var(--line))}.lr.off{opacity:.5}
+@keyframes lrIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.lr-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.lr-name{font-size:15px}.lr-chk{display:flex;min-width:28px;min-height:28px;align-items:center}.lr-chk input{width:20px;height:20px;accent-color:var(--acc)}
+.lr-sel{background:#0f1318;border:1px solid var(--line);border-radius:8px;padding:6px 8px;min-height:38px}
+.lr-mid{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:6px 0 8px 38px}
+.lr-val{width:104px;background:none;border:0;border-bottom:2px solid var(--line);border-radius:0;font:700 26px ui-monospace,SFMono-Regular,Menlo,monospace;padding:2px 0;color:var(--ink);font-variant-numeric:tabular-nums}
+.lr-val:focus{outline:none;border-bottom-color:var(--acc)}.lr-unit{color:var(--mut);font-size:13px}
+.lr-rng{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--mut)}.lr-rng input{width:92px;min-height:34px;padding:4px 8px}
+.lr-live{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:38px}
+.gauge{position:relative;flex:1;min-width:110px;max-width:240px;height:8px;background:#222b36;border-radius:6px}
+.gauge .gz{position:absolute;top:0;bottom:0;border-radius:6px;background:color-mix(in srgb,var(--good) 38%,transparent)}
+.gauge .gd{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--warn);border:2px solid var(--card);box-shadow:0 0 0 1px var(--line)}
+.gauge .gd.good{background:var(--good)}
+.lr-in{font-size:12.5px;color:var(--mut)}.lr-in.out{color:var(--warn)}
+.xtra{border:1px dashed var(--line);border-radius:12px;padding:12px;margin-top:12px}.xtra h4{margin:0 0 4px;font-size:14px}
+.xl{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line);margin-top:8px;font-size:13px}
+.labbar{position:sticky;bottom:12px;margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+@media(max-width:700px){.labbar{bottom:calc(74px + var(--safeb))}.lr-mid,.lr-live{margin-left:0}.lr-rng{margin-left:0;width:100%}}
+.sum{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.lr-live .chip{flex:none}.lr-in{flex:none;min-width:112px;text-align:right}.gauge{flex:1 1 120px}
+@media(max-width:700px){.lr-in{min-width:0;text-align:left;flex-basis:100%}}
+
 </style>
 </head>
 <body>
@@ -267,12 +308,13 @@ const TESTS={
   hdl:{name:'HDL cholesterol',unit:'mg/dL',dec:0,general:'40+ acceptable, 60+ protective',fn:v=>v<40?['Low','bad']:v<60?['Acceptable','ok']:['Protective','good'],match:/\bHDL\b/i,skip:/ratio|non[- ]?hdl|\bLDL\b/i},
   trig:{name:'Triglycerides',unit:'mg/dL',dec:0,general:'Under 150',ref:150,refLabel:'normal under',fn:v=>v<150?['Normal','good']:v<200?['Borderline high','warn']:v<500?['High','bad']:['Very high','bad'],match:/triglycerid/i},
   tc:{name:'Total cholesterol',unit:'mg/dL',dec:0,general:'Under 200',ref:200,refLabel:'desirable under',fn:v=>v<200?['Desirable','good']:v<240?['Borderline high','warn']:['High','bad'],match:/total\s+cholesterol|cholesterol,?\s*total/i,skip:/ratio/i},
+  vldl:{name:'VLDL cholesterol',unit:'mg/dL',dec:0,general:'About 5–40',fn:v=>v<=40?['Typical','good']:['Above typical','warn'],match:/\bVLDL\b/i},
   a1c:{name:'Hemoglobin A1C',unit:'%',dec:1,general:'Under 5.7',ref:5.7,refLabel:'normal under',fn:v=>v<5.7?['Normal','good']:v<6.5?['Elevated','warn']:['High','bad'],match:/a1c/i},
   glu:{name:'Fasting glucose',unit:'mg/dL',dec:0,general:'70–99',ref:100,refLabel:'normal under',fn:v=>v<70?['Low','warn']:v<100?['Normal','good']:v<126?['Elevated','warn']:['High','bad'],match:/glucose/i,skip:/urine|random|tolerance|post/i},
   vitd:{name:'Vitamin D (25-OH)',unit:'ng/mL',dec:0,general:'30–100 typical',fn:v=>v<20?['Low','warn']:v<30?['Below typical','warn']:v<=100?['Typical','good']:['High','warn'],match:/vitamin\s*d|25[- ]?(?:oh|hydroxy)/i},
   tsh:{name:'TSH',unit:'mIU/L',dec:2,general:'0.4–4.0 typical',fn:v=>v<0.4?['Below typical','warn']:v<=4?['Typical','good']:['Above typical','warn'],match:/\bTSH\b|thyroid stimulating/i}
 };
-const CONV={ldl:38.67,hdl:38.67,tc:38.67,trig:88.57,glu:18.016};
+const CONV={ldl:38.67,hdl:38.67,tc:38.67,vldl:38.67,trig:88.57,glu:18.016};
 const testKeys=()=>Object.keys(TESTS);
 
 const MONTHS_RE='(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\\.?';
@@ -307,11 +349,20 @@ function inRange(v,r){
 const RANGE_RE=/\(?\s*((?:<=|>=|≤|≥|<|>)\s*\d+(?:\.\d+)?|\d+(?:\.\d+)?\s*[-–—]\s*\d+(?:\.\d+)?)\s*\)?/;
 const UNIT_RE=/^\s*(mg\/dL|mmol\/L|nmol\/L|ng\/mL|mIU\/L|uIU\/mL|µIU\/mL|%)/i;
 
+function blockRange(lines,i){
+  // portal pastes put the lab's own range on a nearby line: 'Expected range: 0-99' or 'between 100 and 199'
+  const blk=[];for(let j=i;j<lines.length&&j<i+14;j++){if(j>i&&/^\s*Result detail\s+\d+/i.test(lines[j]))break;blk.push(lines[j])}
+  const t=blk.join('\n');let m=/expected range\s*:?\s*((?:<=|>=|≤|≥|<|>)\s*\d+(?:\.\d+)?|\d+(?:\.\d+)?\s*[-–—]\s*\d+(?:\.\d+)?)/i.exec(t);
+  if(m)return normRange(m[1]);
+  m=/between\s+(\d+(?:\.\d+)?)\s+and\s+(\d+(?:\.\d+)?|null)/i.exec(t);
+  if(m)return m[2]==='null'?'>'+m[1]:m[1]+'-'+m[2];
+  return '';
+}
 function parseLabText(text){
   const lines=String(text).split(/\r?\n/);const rows=[];
   for(const k of testKeys()){
     const T=TESTS[k];
-    for(const raw of lines){
+    for(let li=0;li<lines.length;li++){const raw=lines[li];
       let line=raw;if(k==='vitd')line=line.replace(/25[- ]?(?:oh|hydroxy)/ig,' ');
       const m=T.match.exec(line);if(!m||(T.skip&&T.skip.test(line)))continue;
       const rest=line.slice(m.index+m[0].length);
@@ -325,11 +376,27 @@ function parseLabText(text){
       else unit=T.unit;
       const tail=um?after.slice(um[0].length):after;
       const rm=RANGE_RE.exec(tail);
-      rows.push({test:k,value,unit:T.unit,range:rm?normRange(rm[1]):'',note});
+      rows.push({test:k,value,unit:T.unit,range:rm?normRange(rm[1]):blockRange(lines,li),note});
       break;
     }
   }
   return {date:parseDateText(text),rows};
+}
+
+
+/* ---------- paste workspace: results + where each came from + unrecognized lines ---------- */
+function labLineFor(lines,k){const T=TESTS[k];if(!T)return -1;for(let i=0;i<lines.length;i++){const m=T.match.exec(lines[i]);if(!m||(T.skip&&T.skip.test(lines[i])))continue;if(/\d/.test(lines[i].slice(m.index+m[0].length)))return i}return -1}
+function labWorkspace(text){
+  const lines=String(text).split(/\r?\n/);const p=parseLabText(text);const used=new Set();
+  const rows=p.rows.map(r=>{const line=labLineFor(lines,r.test);const rl=[];
+    if(line>=0){used.add(line);for(let j=line;j<lines.length&&j<line+14;j++){if(j>line&&/^\s*Result detail\s+\d+/i.test(lines[j]))break;if(/expected range|between\s+\d/i.test(lines[j]))rl.push(j)}}
+    return {...r,line,rangeLines:rl}});
+  const UN='(mg\\/dL|mmol\\/L|ng\\/mL|pg\\/mL|µIU\\/mL|uIU\\/mL|mIU\\/L|U\\/L|g\\/dL|%|IU\\/L)';
+  const extras=[];
+  lines.forEach((l,i)=>{if(used.has(i)||/^\s*Expected range/i.test(l))return;
+    const m=new RegExp('^\\s*Result detail \\d+\\.\\s*([^.]+)\\.[^.]*\\.\\s*(\\d+(?:\\.\\d+)?)\\s*'+UN,'i').exec(l)||new RegExp('([A-Za-z][A-Za-z0-9 ,()\\/-]{2,40}?)[\\s:-]+(\\d+(?:\\.\\d+)?)\\s*'+UN,'i').exec(l);
+    if(m)extras.push({line:i,text:l.trim(),name:m[1].trim(),value:parseFloat(m[2]),unit:m[3]})});
+  return {date:p.date,rows,extras,lines};
 }
 
 /* ---------- body metrics ---------- */
@@ -759,7 +826,7 @@ function homeBody(){
     return `<div class="stack">${card('Your cards',`<ul class="plain">${h.order.map((id,i)=>`<li class="crow"><span class="cn">${HC[id].t}${HC[id].cond&&!visible(id)?' <span class="mut" style="font-weight:400;font-size:12px">(shows when you have some)</span>':''}</span><span class="seg sm" role="group" aria-label="${HC[id].t}">${[['pin','Pinned'],['more','More'],['hide','Hidden']].map(([w,l])=>`<button data-a="home-where" data-v="${id}:${w}" aria-pressed="${h.where[id]===w}">${l}</button>`).join('')}</span><span class="row" style="margin:0;gap:4px"><button class="ib" aria-label="Move ${HC[id].t} up" data-a="home-move" data-v="${id}:-1" ${i===0?'disabled':''}>↑</button><button class="ib" aria-label="Move ${HC[id].t} down" data-a="home-move" data-v="${id}:1" ${i===h.order.length-1?'disabled':''}>↓</button></span></li>`).join('')}</ul><p class="note">${pinned} pinned. About 6 or fewer fits one screen without scrolling.</p>`)}</div>`;
   }
   const first=!act(d.goals).length&&!act(d.labs).length&&!act(d.readings).length;
-  if(first)return `<div class="grid"><section class="card span4"><h3>Start here</h3><p>Three small steps make this page useful. Everything stays on this device.</p><ul class="plain" style="margin-top:12px"><li><span><b>1. Add your height</b><br><span class="mut">Optional. Used for BMI and waist ÷ height.</span></span><button class="btn ghost sm" data-a="go" data-v="settings">Settings</button></li><li><span><b>2. Set a goal</b><br><span class="mut">For example: LDL under 100, or lose fat and keep muscle.</span></span><button class="btn sm" data-a="goal-new">Set a goal</button></li><li><span><b>3. Add lab results</b><br><span class="mut">Paste the text from your lab report and review it.</span></span><button class="btn ghost sm" data-a="go" data-v="labs">Add results</button></li></ul></section></div>`;
+  if(first)return `<div class="grid"><section class="card span4"><h3>Start here</h3><p>Three small steps make this page useful. Everything stays on this device.</p><ul class="plain" style="margin-top:12px"><li><span><b>1. Add your height</b><br><span class="mut">Optional. Used for BMI and waist ÷ height.</span></span><button class="btn sm" data-a="height-dlg">Add height</button></li><li><span><b>2. Set a goal</b><br><span class="mut">For example: LDL under 100, or lose fat and keep muscle.</span></span><button class="btn sm" data-a="goal-new">Set a goal</button></li><li><span><b>3. Add lab results</b><br><span class="mut">Paste the text from your lab report and review it.</span></span><button class="btn ghost sm" data-a="go" data-v="labs">Add results</button></li></ul></section></div>`;
   const ids=h.order.filter(id=>h.where[id]===A.homePage&&visible(id));
   if(!ids.length)return `<div class="empty">Nothing on this page yet. Use Customize to move cards here.</div>`;
   return `<div class="grid">${ids.map(id=>card(HC[id].t,HC[id].r(),HC[id].cls||'')).join('')}</div>`;
@@ -787,9 +854,10 @@ VIEWS.goals=()=>{
   <div class="hbar" style="margin:0"><h3 style="font-size:16px">Your goals</h3><button class="btn" data-a="goal-new">+ Add a goal</button></div>
   ${gs.length?`<div class="g2">${gs.map(goalCard).join('')}</div>`:`<div class="empty">No goals yet. A goal can be a lab target, a range to stay in, a direction, or a weekly habit.</div>`}</div>`;
 };
+const GOAL_PRESETS=[['Lose weight',{t:'direction',k:'weight',dir:'down',title:'Lose weight'}],['Smaller waist',{t:'direction',k:'waist',dir:'down',title:'Smaller waist'}],['Train 3× a week',{t:'habit',n:3,title:'Strength training'}],['Sleep 7–9 hours',{t:'range',k:'sleep',lo:7,hi:9,title:'Sleep 7–9 hours'}],['Lower LDL',{t:'target',k:'ldl',target:100,title:'LDL under 100'}],['Blood pressure under 120',{t:'range',k:'bp',hi:120,title:'Blood pressure under 120'}]];
 function goalDialog(g){
   const edit=!!g;g=g||{type:'target',setBy:'me',baseline:'first'};
-  const html=`<div class="fld">What kind of goal?<select id="gtype">${options(Object.entries(GOAL_TYPES),g.type)}</select></div>
+  const html=`${edit?'':`<p class="mut" style="font-size:13px;margin-bottom:6px">Quick start (or fill in your own below)</p><div class="chips" style="margin-bottom:12px">${GOAL_PRESETS.map((p,i)=>`<button type="button" class="chip mut" style="border:0;cursor:pointer;min-height:34px" data-pre="${i}">${p[0]}</button>`).join('')}</div>`}<div class="fld">What kind of goal?<select id="gtype">${options(Object.entries(GOAL_TYPES),g.type)}</select></div>
   <p class="note" id="gtypehelp" style="margin:-6px 0 12px"></p>
   <div class="fld">Name<input class="inp" id="gtitle" value="${esc(g.title||'')}" placeholder="e.g. LDL under 100" maxlength="80"></div>
   <div class="fld" data-for="target range direction">Measured by<select id="gkey">${measureOptions(g.key||'ldl')}</select></div>
@@ -818,6 +886,9 @@ function goalDialog(g){
   }});
   const sync=()=>{const t=val(d,'gtype');d.querySelectorAll('[data-for]').forEach(e=>e.classList.toggle('hidden',!e.dataset.for.split(' ').includes(t)));d.querySelector('#gtypehelp').textContent=help[t]};
   d.addEventListener('change',e=>{if(e.target.id==='gtype')sync()});sync();
+  d.querySelectorAll('[data-pre]').forEach(b=>b.addEventListener('click',()=>{const p=GOAL_PRESETS[+b.dataset.pre][1],set=(id,v)=>{const e=d.querySelector('#'+id);if(e)e.value=v==null?'':v};
+    set('gtype',p.t);if(p.k)set('gkey',p.k);set('gtarget',p.target);set('glo',p.lo);set('ghi',p.hi);if(p.dir)set('gdir',p.dir);if(p.n)set('gn',p.n);set('gtitle',p.title);sync();
+    d.querySelectorAll('[data-pre]').forEach(x=>x.style.outline='');b.style.outline='2px solid var(--good)'}));
 }
 
 /* ---------- LABS ---------- */
@@ -830,10 +901,95 @@ function labCard(k){
   ${chartHTML({pts:s,ref:T.ref,refLabel:T.refLabel,from,to,w:360,h:140,label:T.name+' over time'})}
   <div class="row"><button class="btn ghost sm" data-a="lab-details" data-v="${k}">All results (${s.length})</button></div></section>`;
 }
+
+/* ---------- LAB PASTE WORKSPACE ---------- */
+const LAB0=()=>({text:'',edits:{},manual:[],ign:{},track:{},date:'',dateSet:false,keep:true,mode:'text'});
+A.lab=LAB0();
+function labRows(W){
+  const L=A.lab,dt=L.dateSet?L.date:(W.date||todayStr()),have=new Set(act(D().labs).map(l=>l.test+'|'+l.date+'|'+l.value));
+  const rows=W.rows.map(r=>{const e=L.edits[r.test]||{},v=e.value!=null?e.value:String(r.value),dup=have.has(r.test+'|'+dt+'|'+parseFloat(v));
+    return {key:r.test,test:r.test,value:v,range:e.range!=null?e.range:r.range,on:e.on!=null?e.on:!dup,dup,note:r.note,auto:true}});
+  L.manual.forEach((m,i)=>rows.push({key:'m'+i,test:m.test,value:m.value,range:m.range,on:m.on!==false,dup:false,note:'added by hand',auto:false,mi:i}));
+  return rows;
+}
+function lrLive(r){
+  const T=TESTS[r.test],v=parseFloat(String(r.value).replace(',','.'));
+  if(isNaN(v))return `<span class="chip mut">Enter a number</span>`;
+  const s=T.fn(v),pr=parseRange(r.range),inr=pr?inRange(v,pr):null;
+  let g='';
+  if(pr){const lo=pr.lo!=null?pr.lo:0,hi=pr.hi!=null?pr.hi:null,max=Math.max(hi!=null?hi*1.5:lo*2.2,v*1.12,1),pc=x=>Math.max(0,Math.min(100,x/max*100)),zs=pc(lo),ze=hi!=null?pc(hi):100;
+    g=`<div class="gauge" aria-hidden="true"><i class="gz" style="left:${zs}%;width:${Math.max(ze-zs,1)}%"></i><i class="gd ${inr?'good':'warn'}" style="left:${pc(v)}%"></i></div>`}
+  return `<span class="chip ${s[1]}">${esc(s[0])}</span>${g}<span class="lr-in ${inr===false?'out':''}">${inr==null?'':inr?'inside lab range':'outside lab range'}</span>`;
+}
+function labSrcHTML(W){
+  const L=A.lab;
+  if(L.mode==='text'||!L.text.trim())return `<textarea id="paste" aria-label="Paste lab text" spellcheck="false" placeholder="Paste the text from your lab report or patient portal here.&#10;&#10;Tip: on the portal page, select all, copy, and paste. Extra words like Print or Download are fine.">${esc(L.text)}</textarea>`;
+  const hl=new Map(),h2=new Map();W.rows.forEach(r=>{if(r.line>=0){hl.set(r.line,r.test);r.rangeLines.forEach(j=>h2.set(j,r.test))}});
+  return `<pre class="src" id="srcv" tabindex="0">${W.lines.map((l,i)=>hl.has(i)?`<span class="hl" data-hk="${hl.get(i)}" data-a="lab-jump" data-v="${hl.get(i)}">${esc(l)}</span>`:h2.has(i)?`<span class="hl2" data-hk="${h2.get(i)}">${esc(l)}</span>`:esc(l)).join('\n')}</pre><p class="legend"><i class="k1"></i>value read <i class="k2"></i>lab range · tap a highlight to jump to its result</p>`;
+}
+function labPreviewHTML(W){
+  const L=A.lab,rows=labRows(W),n=rows.filter(r=>r.on).length,dt=L.dateSet?L.date:(W.date||todayStr()),ex=W.extras.filter(x=>!L.ign[x.line]);
+  const opts=k=>testKeys().map(t=>`<option value="${t}" ${t===k?'selected':''}>${esc(TESTS[t].name)}</option>`).join('');
+  if(!L.text.trim()&&!L.manual.length)return `<div class="lab-empty"><div class="lab-ill" aria-hidden="true"><svg viewBox="0 0 64 64" width="56" height="56" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="8" width="36" height="48" rx="6"/><path d="M22 22h20M22 31h20M22 40h12"/><path d="M44 46l4 4 8-9" stroke="var(--acc)"/></svg></div><b>Your results will appear here</b><p class="mut">Paste a report on the left. Each value is read, checked against the lab’s own range, and shown with where it came from. You can fix anything before saving.</p><div class="row" style="justify-content:center"><button class="btn ghost sm" data-a="lab-addrow">+ Add one by hand</button></div></div>`;
+  return `<div class="sum"><span class="chip good">${n} to save</span>${ex.length?`<span class="chip warn">${ex.length} not recognized</span>`:''}</div>
+  <label class="datepill"><span class="mut">Date of the test</span><input type="date" id="labdate" value="${dt}">${!W.date&&!L.dateSet?'<span class="chip warn">no date found</span>':''}</label>
+  ${rows.length?rows.map((r,i)=>{const T=TESTS[r.test];return `<div class="lr ${r.on?'':'off'}" data-k="${r.key}" style="--i:${i}">
+    <div class="lr-top"><label class="lr-chk"><input type="checkbox" data-lf="on" ${r.on?'checked':''} aria-label="Include ${esc(T.name)}"></label>${r.auto?`<b class="lr-name">${esc(T.name)}</b>`:`<select class="lr-sel" data-lf="test">${opts(r.test)}</select>`}${r.dup?'<span class="chip mut">already saved</span>':''}${r.auto?'':'<button class="btn ghost sm" data-a="lab-delrow" data-v="'+r.mi+'">Remove</button>'}</div>
+    <div class="lr-mid"><input class="lr-val" inputmode="decimal" data-lf="value" value="${esc(r.value)}" aria-label="Value"><span class="lr-unit">${esc(T.unit)}</span><label class="lr-rng">Lab range <input class="inp" data-lf="range" value="${esc(r.range)}" placeholder="e.g. 0-99"></label></div>
+    <div class="lr-live">${lrLive(r)}</div>${r.note?`<div class="mut" style="font-size:12px;margin-top:4px">${esc(r.note)}</div>`:''}</div>`}).join(''):''}
+  ${ex.length?`<div class="xtra"><h4>Found but not tracked yet</h4><p class="mut" style="font-size:12.5px">Nothing is lost: your original text is kept in Notes. You can also track one as its own measurement.</p>${ex.map(x=>`<div class="xl"><span class="mono">${esc(x.name)} ${x.value} ${esc(x.unit)}</span><span class="row" style="margin:0;gap:6px"><button class="btn ${L.track[x.line]?'':'ghost'} sm" data-a="lab-track" data-v="${x.line}" aria-pressed="${!!L.track[x.line]}">${L.track[x.line]?'✓ Will track':'Track it'}</button><button class="btn ghost sm" data-a="lab-ign" data-v="${x.line}">Ignore</button></span></div>`).join('')}</div>`:''}
+  <div class="row" style="margin:12px 0 0"><button class="btn ghost sm" data-a="lab-addrow">+ Add a result by hand</button></div>
+  <div class="labbar"><label class="sw" style="margin:0"><input type="checkbox" id="labkeep" ${L.keep?'checked':''}> Keep original text in Notes (locked)</label><div class="row" style="margin:0"><span class="err" id="laberr" style="margin:0" role="alert"></span><button class="btn" data-a="lab-save" ${n+Object.values(L.track).filter(Boolean).length?'':'disabled'}>Save ${n} result${n===1?'':'s'}</button></div></div>`;
+}
+function labWorkspaceHTML(){
+  const W=labWorkspace(A.lab.text),L=A.lab;
+  return `<div class="labws" id="labws"><section class="card"><div class="hbar" style="margin-bottom:10px"><h3 style="margin:0">Paste</h3><div class="seg" role="group" aria-label="View"><button data-a="lab-mode" data-v="text" aria-pressed="${L.mode==='text'||!L.text.trim()}">Text</button><button data-a="lab-mode" data-v="hl" aria-pressed="${L.mode==='hl'&&!!L.text.trim()}" ${L.text.trim()?'':'disabled'}>Highlights</button>${L.text.trim()?'<button data-a="lab-clear" aria-label="Clear pasted text">Clear</button>':''}</div></div><div id="labsrc">${labSrcHTML(W)}</div></section>
+  <section class="card"><h3>What the app found</h3><div id="labpv">${labPreviewHTML(W)}</div></section></div>`;
+}
+function labSeg(){const seg=$('#labws .seg');if(!seg)return;const L=A.lab,has=!!L.text.trim();seg.innerHTML=`<button data-a="lab-mode" data-v="text" aria-pressed="${L.mode==='text'||!has}">Text</button><button data-a="lab-mode" data-v="hl" aria-pressed="${L.mode==='hl'&&has}" ${has?'':'disabled'}>Highlights</button>${has?'<button data-a="lab-clear" aria-label="Clear pasted text">Clear</button>':''}`}
+function labRefresh(which){
+  const W=labWorkspace(A.lab.text);const pv=$('#labpv'),sc=$('#labsrc');
+  if(which!=='preview'&&sc)sc.innerHTML=labSrcHTML(W);
+  labSeg();
+  if(pv)pv.innerHTML=labPreviewHTML(W);
+}
+function labStore(row){const L=A.lab,k=row.dataset.k;return k[0]==='m'&&/^m\d+$/.test(k)?L.manual[+k.slice(1)]:(L.edits[k]=L.edits[k]||{})}
+function labSave(){
+  const L=A.lab,W=labWorkspace(L.text),rows=labRows(W),dt=L.dateSet?L.date:(W.date||todayStr()),err=m=>{const e=$('#laberr');if(e)e.textContent=m};
+  if(!dt)return err('Pick the date of the test.');
+  const out=[];for(const r of rows){if(!r.on)continue;const v=N(r.value);if(v==null)return err('Check the value for '+TESTS[r.test].name+'.');out.push({test:r.test,value:v,unit:TESTS[r.test].unit,range:r.range})}
+  const tracks=W.extras.filter(x=>L.track[x.line]);
+  if(!out.length&&!tracks.length)return err('Nothing selected.');
+  const have=new Set(act(D().labs).map(l=>l.test+'|'+l.date+'|'+l.value)),batch='b'+Date.now().toString(36);let n=0,skipped=0,noteId=null;
+  mutate(x=>{
+    out.forEach(w=>{if(have.has(w.test+'|'+dt+'|'+w.value)){skipped++;return}addRec(x,'labs',{...w,date:dt,source:'paste',batch});n++});
+    tracks.forEach(t=>{let def=act(x.metricDefs).find(m=>m.name.toLowerCase()===t.name.toLowerCase());if(!def)def=addRec(x,'metricDefs',{name:t.name,unit:t.unit,better:'none',dec:1,batch});addRec(x,'readings',{metric:def.id,value:t.value,date:dt,batch});n++});
+    if(L.keep&&L.text.trim())noteId=addRec(x,'notes',{tag:'Lab text',text:L.text,date:dt,status:'',batch}).id;
+    x.imports.push(stamp({id:batch,date:dt,at:nowISO(),count:n,noteId}))});
+  A.lab=LAB0();draw();
+  toast('Saved '+n+' result'+(n===1?'':'s')+(skipped?' ('+skipped+' already saved)':''),()=>removeImport(batch,true));
+}
+document.addEventListener('input',e=>{
+  const t=e.target;if(!t.closest||!t.closest('#labws'))return;const L=A.lab;
+  if(t.id==='paste'){L.text=t.value;labRefresh('preview');return}
+  if(t.id==='labdate'){L.date=t.value;L.dateSet=true;return}
+  const row=t.closest('.lr');if(!row||!t.dataset.lf)return;
+  if(t.dataset.lf==='value'||t.dataset.lf==='range'){const s=labStore(row);s[t.dataset.lf]=t.value;const W=labWorkspace(L.text),r=labRows(W).find(x=>x.key===row.dataset.k);if(r)row.querySelector('.lr-live').innerHTML=lrLive(r)}
+});
+document.addEventListener('paste',e=>{if(e.target&&e.target.id==='paste')setTimeout(()=>{A.lab.text=e.target.value;A.lab.mode='hl';labRefresh();const pv=$('#labpv');if(pv&&matchMedia('(max-width:900px)').matches)pv.scrollIntoView({behavior:'smooth',block:'start'})},0)});
+document.addEventListener('change',e=>{
+  const t=e.target;if(!t.closest||!t.closest('#labws'))return;const L=A.lab;
+  if(t.id==='labkeep'){L.keep=t.checked;return}
+  if(t.id==='labdate'){labRefresh('preview');return}
+  const row=t.closest('.lr');if(!row||!t.dataset.lf)return;
+  if(t.dataset.lf==='on'){labStore(row).on=t.checked;labRefresh('preview')}
+  if(t.dataset.lf==='test'){labStore(row).test=t.value;labRefresh('preview')}
+});
+document.addEventListener('focusin',e=>{const row=e.target.closest&&e.target.closest('.lr');const sv=$('#srcv');if(!sv)return;sv.querySelectorAll('.on').forEach(x=>x.classList.remove('on'));if(!row)return;const k=row.dataset.k;sv.querySelectorAll(`[data-hk="${k}"]`).forEach((x,i)=>{x.classList.add('on');if(i===0)x.scrollIntoView({block:'nearest',behavior:'smooth'})})});
 VIEWS.labs=()=>{
   const d=D(),ks=testKeys().filter(k=>seriesFor(d,k).length),imps=act(d.imports).sort((a,b)=>a.at<b.at?1:-1);
-  return `<div class="stack">${card('Add results',`<p class="mut" style="font-size:14px">Copy the text from your lab report or patient portal and paste it here. You will review everything before anything is saved.</p><textarea id="paste" aria-label="Paste lab text" placeholder="Paste lab text here"></textarea><div class="row"><button class="btn" data-a="lab-read">Read results</button><button class="btn ghost" data-a="lab-add">Add one by hand</button><span class="err" id="pasteerr" style="margin:0"></span></div>`)}
-  ${ks.length?`<div class="hbar" style="margin:0"><h3 style="font-size:16px">Your results</h3>${rangeChips(A.labRange,'lab-range')}</div><div class="g3">${ks.map(labCard).join('')}</div>`:`<div class="empty">No results yet. Paste a report above to get started.</div>`}
+  return `<div class="stack">${labWorkspaceHTML()}
+  ${ks.length?`<div class="hbar" style="margin:0"><h3 style="font-size:16px">Your results</h3>${rangeChips(A.labRange,'lab-range')}</div><div class="g3">${ks.map(labCard).join('')}</div>`:`<div class="empty">No results yet. Paste a report in the box above to get started.</div>`}
   ${imps.length?card('Import history',`<ul class="plain">${imps.map(i=>`<li><span><b>${fmtDate(i.date)}</b><br><span class="mut">${i.count} result${i.count===1?'':'s'} · added ${fmtDate(i.at.slice(0,10))}</span></span><button class="btn ghost sm" data-a="import-remove" data-v="${i.id}">Remove import</button></li>`).join('')}</ul>`):''}</div>`;
 };
 function labReview(text){
@@ -861,7 +1017,7 @@ function labReview(text){
   }});
 }
 function removeImport(id,withNote){
-  mutate(x=>{const i=x.imports.find(r=>r.id===id);if(!i)return;act(x.labs).filter(l=>l.batch===id).forEach(l=>delRec(x,'labs',l.id));if(withNote&&i.noteId)delRec(x,'notes',i.noteId);delRec(x,'imports',id)});
+  mutate(x=>{const i=x.imports.find(r=>r.id===id);if(!i)return;act(x.labs).filter(l=>l.batch===id).forEach(l=>delRec(x,'labs',l.id));act(x.readings).filter(l=>l.batch===id).forEach(l=>delRec(x,'readings',l.id));act(x.metricDefs).filter(l=>l.batch===id).forEach(l=>delRec(x,'metricDefs',l.id));if(withNote&&i.noteId)delRec(x,'notes',i.noteId);delRec(x,'imports',id)});
 }
 function labManual(k){
   dlg('Add a result',`<div class="fld">Test<select id="mt">${options(testKeys().map(t=>[t,TESTS[t].name+' ('+TESTS[t].unit+')']),k||'ldl')}</select></div><div class="fld2"><div class="fld">Value<input class="inp" id="mv" inputmode="decimal"></div><div class="fld">Date<input class="inp" type="date" id="md" value="${todayStr()}"></div></div><div class="fld">Lab's reference range (optional)<input class="inp" id="mr" placeholder="e.g. 0-99 or &lt;200"></div>`,{ok:'Add',onOk:(dd)=>{const v=N(val(dd,'mv'));if(v==null)return dErr(dd,'Enter the value.');const dt=val(dd,'md');if(!dt)return dErr(dd,'Enter the date.');const rg=val(dd,'mr').trim();
@@ -953,7 +1109,7 @@ VIEWS.track=()=>{
   }
   const fasts=act(d.fasts).filter(f=>f.end).sort((a,b)=>a.end<b.end?1:-1).slice(0,5);
   return `<div class="stack"><div class="g3">${act(d.metricDefs).map(metricCard).join('')}${derived}</div>
-  ${!h?`<p class="note">Add your height in Settings to see BMI and waist ÷ height.</p>`:derived?`<p class="note">BMI is a rough screen and can read high if you carry muscle. Waist ÷ height and your trends tell more. General ranges only; your doctor's targets come first.</p>`:''}
+  ${!h?`<p class="note">Add your height to see BMI and waist ÷ height. <button class="btn sm" data-a="height-dlg">Add height</button></p>`:derived?`<p class="note">BMI is a rough screen and can read high if you carry muscle. Waist ÷ height and your trends tell more. General ranges only; your doctor's targets come first.</p>`:''}
   <div class="row" style="margin:0"><button class="btn ghost" data-a="metric-new">+ Track something else</button></div>
   <div class="g2">${card('Fasting',fastCard()+(fasts.length?`<ul class="plain" style="margin-top:14px">${fasts.map(f=>`<li><span>${fmtDate(f.start.slice(0,10),false)}</span><span class="mono mut">${fmtDur(Date.parse(f.end)-Date.parse(f.start))}</span></li>`).join('')}</ul>`:''))}${card('Check-in',HC.checkin.r())}</div>${foodCards()}</div>`;
 };
@@ -1155,10 +1311,19 @@ const ACT={
   'home-page':el=>{const v=el.dataset.v;if(v==='cust')A.cust=true;else if(v==='done')A.cust=false;else A.homePage=v;refreshHome()},
   'home-where':el=>{const [id,w]=el.dataset.v.split(':');mutate(x=>{x.settings.home.where[id]=w;stamp(x.settings)},{render:false});refreshHome()},
   'home-move':el=>{const [id,dl]=el.dataset.v.split(':');mutate(x=>{const o=x.settings.home.order,i=o.indexOf(id),j=i+ +dl;if(j>=0&&j<o.length){[o[i],o[j]]=[o[j],o[i]]}stamp(x.settings)},{render:false});refreshHome()},
+  'height-dlg':()=>{const h=D().profile.heightIn||0;dlg('Your height',`<p class="mut" style="font-size:14px">Used only for BMI and waist ÷ height. Stays on this device.</p><div class="fld2"><div class="fld">Feet<input class="inp" id="hf" inputmode="numeric" value="${h?Math.floor(h/12):''}"></div><div class="fld">Inches<input class="inp" id="hi" inputmode="decimal" value="${h?Math.round(h%12):''}"></div></div>`,{ok:'Save',onOk:(dd)=>{const t=(N(val(dd,'hf'))||0)*12+(N(val(dd,'hi'))||0);if(t<36||t>96)return dErr(dd,'Enter a height between 3 and 8 feet.');mutate(x=>{x.profile.heightIn=t;stamp(x.profile)})}})},
   'goal-new':()=>goalDialog(),
   'goal-edit':el=>goalDialog(D().goals.find(g=>g.id===el.dataset.v)),
   'goal-del':el=>{const id=el.dataset.v;mutate(x=>delRec(x,'goals',id));toast('Goal deleted',()=>mutate(x=>restoreRec(x,'goals',id)))},
   'habit-log':el=>{const id=el.dataset.v,t=todayStr();const ex=act(D().habitLogs).find(h=>h.goal===id&&h.date===t);mutate(x=>{if(ex)delRec(x,'habitLogs',ex.id);else addRec(x,'habitLogs',{goal:id,date:t})})},
+  'lab-mode':el=>{A.lab.mode=el.dataset.v;labRefresh();if(el.dataset.v==='text'){const t=$('#paste');if(t)t.focus()}},
+  'lab-clear':()=>{A.lab=LAB0();draw()},
+  'lab-jump':el=>{const row=document.querySelector(`.lr[data-k="${el.dataset.v}"]`);if(row){row.scrollIntoView({block:'center',behavior:'smooth'});const i=row.querySelector('.lr-val');if(i)setTimeout(()=>i.focus({preventScroll:true}),250)}},
+  'lab-addrow':()=>{A.lab.manual.push({test:'ldl',value:'',range:'',on:true});labRefresh('preview');const rs=document.querySelectorAll('.lr');const last=rs[rs.length-1];if(last){last.scrollIntoView({block:'center',behavior:'smooth'});const i=last.querySelector('.lr-val');if(i)i.focus({preventScroll:true})}},
+  'lab-delrow':el=>{A.lab.manual.splice(+el.dataset.v,1);labRefresh('preview')},
+  'lab-ign':el=>{A.lab.ign[el.dataset.v]=true;labRefresh('preview')},
+  'lab-track':el=>{const L=A.lab;L.track[el.dataset.v]=!L.track[el.dataset.v];labRefresh('preview')},
+  'lab-save':()=>labSave(),
   'lab-read':()=>labReview($('#paste').value),
   'lab-add':()=>labManual(),
   'lab-range':el=>{A.labRange=el.dataset.v;draw()},
